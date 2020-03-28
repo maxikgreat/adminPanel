@@ -1,8 +1,10 @@
 import '../../helpers/iframeLoader.js'
 import axios from 'axios';
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 
 const Editor = () => {
+
+    const _virtualDom = useRef(null);
     const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
         currentPage: 'index.html',
@@ -21,34 +23,90 @@ const Editor = () => {
     };
 
     const open = (page, frame) => {
-        setCurrentPage(currentPage => `../${page}`);
-        frame.load(currentPage, () => {
-            const body = frame.contentDocument.body;
-            let textNodes = [];
-            // get all elements from iframe
-            function recurse(element){
-                element.childNodes.forEach(node => {
-                    // node is text and not 'empty'
-                    if(node.nodeName === "#text" && node.nodeValue.replace(/\s+/g, "").length > 0){
-                        textNodes.push(node);
-                    } else {
-                        recurse(node)
-                    }
-                })
-            }
 
-            recurse(body);
+        setCurrentPage(page);
 
-            textNodes.forEach(node => {
-                //give wrapper each text node with custom editable tag
-                const wrapper = frame.contentDocument.createElement('text-editor');
-                node.parentNode.replaceChild(wrapper, node); //create wrapper
-                wrapper.appendChild(node); //add wrapper
-                wrapper.contentEditable = true;
+        axios.get(`../${page}?rnd=${Math.random()}`) //get pure page.html without js and others scripts
+            .then(res =>(parseStrToDOM(res.data))) // convert string to dom structure
+            .then(wrapTextNodes) //wrap all text nodes with custom tags to editing
+            .then(dom => {
+                _virtualDom.current = dom; // SAVE PURE DOM STRUCTURE
+                return dom
             })
+            .then(serializeDOMToString) //DOM -> STRING
+            .then(html => axios.post('./api/saveTempPage.php', {html})) // create temp dirty page
+            .then(() => frame.load('../temp.html')) //load dirty version to iframe
+            .then(() => enableEditing(frame)) //enable editing
+    };
 
+    const enableEditing = (frame) => {
+        frame.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
+            element.contentEditable = true;
+            element.addEventListener("input", () => {
+                onTextEdit(element)
+            })
+        });
+    };
+
+    const onTextEdit = (element) => {
+        const id = element.getAttribute("nodeid");
+        //write changes from dirty copy to pure
+        _virtualDom.current.body.querySelector(`[nodeid="${id}"]`).innerHTML = element.innerHTML;
+    };
+
+    const wrapTextNodes = (dom) => {
+        const body = dom.body;
+        let textNodes = [];
+        // get all elements from iframe
+        function recurse(element){
+            element.childNodes.forEach(node => {
+                // node is text and not 'empty'
+                if(node.nodeName === "#text" && node.nodeValue.replace(/\s+/g, "").length > 0){
+                    textNodes.push(node);
+                } else {
+                    recurse(node)
+                }
+            })
+        }
+
+        recurse(body);
+
+        textNodes.forEach((node, i) => {
+            //give wrapper each text node with custom editable tag
+            const wrapper = dom.createElement('text-editor');
+            node.parentNode.replaceChild(wrapper, node); //create wrapper
+            wrapper.appendChild(node); //add wrapper
+            wrapper.setAttribute("nodeid", i);
+        });
+        return dom
+    };
+
+    const unWrappedTextNodes = (dom) => {
+        dom.body.querySelectorAll("text-editor").forEach(element => {
+            element.parentNode.replaceChild(element.firstChild, element);
         })
     };
+
+    const serializeDOMToString = (dom) => {
+      const serializer = new XMLSerializer();
+      return serializer.serializeToString(dom);
+    };
+
+    const parseStrToDOM = (str) => {
+        const parser = new DOMParser();
+        return parser.parseFromString(str, "text/html");
+    };
+
+    const save = () => {
+        const newDom = _virtualDom.current.cloneNode(_virtualDom.current);
+        unWrappedTextNodes(newDom);
+        const html = serializeDOMToString(newDom);
+        axios.post("./api/savePage.php", {
+            pageName: currentPage,
+            html
+        })
+    };
+
 
     const loadPageList = async () => {
         try{
@@ -100,6 +158,7 @@ const Editor = () => {
 
     return(
         <>
+            <button onClick={() => save()}>Click</button>
             <iframe src = {currentPage} frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
             {/*<input*/}
             {/*    onChange={(e) => {setPageState(*/}
