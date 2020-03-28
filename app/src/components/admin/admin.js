@@ -1,12 +1,20 @@
+
+import React, {useState, useEffect, useRef} from 'react'
+import axios from 'axios';
 import '../../helpers/iframeLoader.js'
 import DOMHelper from "../../helpers/domHelper";
 import TextEditor from "../textEditor/textEditor";
-import axios from 'axios';
-import React, {useState, useEffect, useRef} from 'react'
+//ui
+//import ModalCustom from "../UI/modal";
+//import AlertCustom from "../UI/alert";
 
 const Admin = () => {
 
     const _virtualDom = useRef(null);
+    //ui
+    const [modal, setModalVisible] = useState(false);
+    const [alert, setAlertVisible] = useState(false);
+
     const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
         pageList: [],
@@ -133,16 +141,19 @@ const Admin = () => {
 
     return(
         <>
-            <button onClick={() => save()}>Click</button>
+            <nav className="navbar navbar-dark bg-light">
+                <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick = {() => {
+                        setModalVisible(true);
+                    }}
+                >Save</button>
+            </nav>
             <iframe src = {currentPage} frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
-            {/*<input*/}
-            {/*    onChange={(e) => {setPageState(*/}
-            {/*        {...pageState, newPageName: e.target.value})*/}
-            {/*    }}*/}
-            {/*    type='text'*/}
-            {/*/>*/}
-            {/*<button onClick = {() => {createNewPage()}}>Create a page</button>*/}
-            {/*{renderPages()}*/}
+            {/*TODO REDUCER FOR MODAL AND ALERT*/}
+
+
         </>
     )
 };

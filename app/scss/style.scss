@@ -1,10 +1,27 @@
+@import './node_modules/bootstrap/scss/bootstrap';
+
+
+//variables
+$panel_height: 70px;
+$primary_color: #007bff;
+$primary_color_2: #343a40;
+$secondary_color: #f8f9fa;
+
+
+//--------------------------------
 *{
   box-sizing: border-box;
 }
+nav{
+  height: $panel_height;
+  border-bottom: 1px solid $primary_color;
+}
+
+
 iframe {
   position: absolute;
-  top: 0;
+  top: $panel_height;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - #{$panel_height});
 }

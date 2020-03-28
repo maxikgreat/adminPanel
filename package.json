@@ -15,8 +15,10 @@
   ],
   "dependencies": {
     "axios": "^0.19.2",
+    "bootstrap": "^4.4.1",
     "core-js": "^3.6.4",
-    "jquery": "^3.4.1"
+    "jquery": "^3.4.1",
+    "react-bootstrap": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
