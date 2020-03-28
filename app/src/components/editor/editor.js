@@ -23,7 +23,30 @@ const Editor = () => {
     const open = (page, frame) => {
         setCurrentPage(currentPage => `../${page}`);
         frame.load(currentPage, () => {
-            console.log(currentPage)
+            const body = frame.contentDocument.body;
+            let textNodes = [];
+            // get all elements from iframe
+            function recurse(element){
+                element.childNodes.forEach(node => {
+                    // node is text and not 'empty'
+                    if(node.nodeName === "#text" && node.nodeValue.replace(/\s+/g, "").length > 0){
+                        textNodes.push(node);
+                    } else {
+                        recurse(node)
+                    }
+                })
+            }
+
+            recurse(body);
+
+            textNodes.forEach(node => {
+                //give wrapper each text node with custom editable tag
+                const wrapper = frame.contentDocument.createElement('text-editor');
+                node.parentNode.replaceChild(wrapper, node); //create wrapper
+                wrapper.appendChild(node); //add wrapper
+                wrapper.contentEditable = true;
+            })
+
         })
     };
 
