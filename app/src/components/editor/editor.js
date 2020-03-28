@@ -1,16 +1,31 @@
+import '../../helpers/iframeLoader.js'
 import axios from 'axios';
 import React, {useState, useEffect} from 'react'
 
 const Editor = () => {
-
+    const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
+        currentPage: 'index.html',
         pageList: [],
         newPageName: ""
     });
 
     useEffect(() => {
-        loadPageList();
+        init(currentPage);
     }, []);
+
+    const init = (page) => {
+        const frame = document.querySelector("iframe");
+        open(page, frame);
+        loadPageList();
+    };
+
+    const open = (page, frame) => {
+        setCurrentPage(currentPage => `../${page}`);
+        frame.load(currentPage, () => {
+            console.log(currentPage)
+        })
+    };
 
     const loadPageList = async () => {
         try{
@@ -62,14 +77,15 @@ const Editor = () => {
 
     return(
         <>
-            <input
-                onChange={(e) => {setPageState(
-                    {...pageState, newPageName: e.target.value})
-                }}
-                type='text'
-            />
-            <button onClick = {() => {createNewPage()}}>Create a page</button>
-            {renderPages()}
+            <iframe src = {currentPage} frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
+            {/*<input*/}
+            {/*    onChange={(e) => {setPageState(*/}
+            {/*        {...pageState, newPageName: e.target.value})*/}
+            {/*    }}*/}
+            {/*    type='text'*/}
+            {/*/>*/}
+            {/*<button onClick = {() => {createNewPage()}}>Create a page</button>*/}
+            {/*{renderPages()}*/}
         </>
     )
 };
