@@ -6,4 +6,4 @@
         array_push($response, basename($file));
     }
 
-    echo json_encode($response );
+    echo json_encode($response);
