@@ -36,9 +36,27 @@ const Editor = () => {
         }
     };
 
+    const deletePage = async (page) => {
+        try{
+            const response = await axios.post('./api/deletePage.php', {
+                "name": page
+            });
+            loadPageList()
+        } catch (e) {
+            alert("No page exists with this name")
+        }
+    };
+
     const renderPages = () => {
         return pageState.pageList.map((page, index) => {
-            return <h1 key={index}>{page}</h1>
+            return <h1
+                key={index}
+            >{page}
+            <a
+                href='#'
+                onClick={() => {deletePage(page)}}
+            >(x)</a>
+            </h1>
         })
     };
 
