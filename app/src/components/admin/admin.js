@@ -1,9 +1,10 @@
 import '../../helpers/iframeLoader.js'
 import DOMHelper from "../../helpers/domHelper";
+import TextEditor from "../textEditor/textEditor";
 import axios from 'axios';
 import React, {useState, useEffect, useRef} from 'react'
 
-const Editor = () => {
+const Admin = () => {
 
     const _virtualDom = useRef(null);
     const [currentPage, setCurrentPage] = useState("index.html");
@@ -37,23 +38,37 @@ const Editor = () => {
             .then(html => axios.post('./api/saveTempPage.php', {html})) // create temp dirty page
             .then(() => frame.load('../temp.html')) //load dirty version to iframe
             .then(() => enableEditing(frame)) //enable editing
+            .then(() => injectStyles()) //styles when editing
     };
 
+    //edition functions
     const enableEditing = (frame) => {
         frame.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
-            element.contentEditable = true;
-            element.addEventListener("input", () => {
-                onTextEdit(element)
-            })
+            const id = element.getAttribute("nodeid");
+            //write changes from dirty copy to pure
+            const virtualElement = _virtualDom.current.body.querySelector(`[nodeid="${id}"]`);
+
+            new TextEditor(element, virtualElement)
         });
     };
 
-    const onTextEdit = (element) => {
-        const id = element.getAttribute("nodeid");
-        //write changes from dirty copy to pure
-        _virtualDom.current.body.querySelector(`[nodeid="${id}"]`).innerHTML = element.innerHTML;
+    const injectStyles = () => {
+        const style = document.querySelector("iframe").contentDocument.createElement("style");
+        style.innerHTML = `
+            text-editor:hover {
+                outline: 3px solid orange;
+                outline-offset: 8px;
+            }
+            text-editor:focus {
+                outline: 3px solid red;
+                outline-offset: 8px;
+            }
+        `;
+        document.querySelector("iframe").contentDocument.head.appendChild(style);
     };
 
+
+    //pages functions
     const loadPageList = async () => {
         try{
             const response = await axios.get('./api');
@@ -132,4 +147,4 @@ const Editor = () => {
     )
 };
 
-export default Editor
+export default Admin

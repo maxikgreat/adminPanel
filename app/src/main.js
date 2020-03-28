@@ -1,5 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Editor from "./components/editor";
+import Admin from "./components/admin/admin";
 
-ReactDOM.render(<Editor /> , document.getElementById('root'));
+ReactDOM.render(<Admin /> , document.getElementById('root'));
