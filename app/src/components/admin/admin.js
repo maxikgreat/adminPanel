@@ -1,19 +1,19 @@
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useContext} from 'react'
 import axios from 'axios';
 import '../../helpers/iframeLoader.js'
 import DOMHelper from "../../helpers/domHelper";
 import TextEditor from "../textEditor/textEditor";
-//ui
-//import ModalCustom from "../UI/modal";
-//import AlertCustom from "../UI/alert";
+//modal
+import ModalCustom from "../UI/modal";
+import {ModalContext} from "../../context/modal/modalContext";
 
 const Admin = () => {
 
+    //context UI elements
+    const {show} = useContext(ModalContext)
+
     const _virtualDom = useRef(null);
-    //ui
-    const [modal, setModalVisible] = useState(false);
-    const [alert, setAlertVisible] = useState(false);
 
     const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
@@ -145,15 +145,15 @@ const Admin = () => {
                 <button
                     type="button"
                     className="btn btn-primary"
-                    onClick = {() => {
-                        setModalVisible(true);
-                    }}
+                    onClick = {() => show(
+                        "Attention!",
+                        "Do you really want to save changes?",
+                        save
+                    )}
                 >Save</button>
             </nav>
             <iframe src = {currentPage} frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
-            {/*TODO REDUCER FOR MODAL AND ALERT*/}
-
-
+            <ModalCustom />
         </>
     )
 };
