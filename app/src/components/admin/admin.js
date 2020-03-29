@@ -30,10 +30,14 @@ const Admin = () => {
     });
 
     useEffect(() => {
-        init(currentPage);
+        init(null, currentPage);
     }, []);
 
-    const init = (page) => {
+    const init = (e, page) => {
+        if(e){
+            e.preventDefault();
+        }
+        loaderShow();
         const frame = document.querySelector("iframe");
         open(page, frame);
         loadPageList();
@@ -52,7 +56,8 @@ const Admin = () => {
             })
             .then(DOMHelper.serializeDOMToString) //DOM -> STRING
             .then(html => axios.post('./api/saveTempPage.php', {html})) // create temp dirty page
-            .then(() => frame.load('../temp.html')) //load dirty version to iframe
+            .then(() => frame.load('../iwoc3fh38_09fksd.html')) //load dirty version to iframe
+            .then(() => axios.post('./api/deleteTempPage.php'))
             .then(() => enableEditing(frame)) //enable editing
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
@@ -103,7 +108,7 @@ const Admin = () => {
     //pages functions
     const loadPageList = async () => {
         try{
-            const response = await axios.get('./api');
+            const response = await axios.get('./api/pageList.php');
             setPageState({
                 ...pageState,
                 pageList: response.data
@@ -161,13 +166,25 @@ const Admin = () => {
                 <div className="col-4">
                     <button
                         type="button"
-                        className="btn btn-primary"
+                        className="btn btn-primary ml-3"
                         onClick = {() => modalShow(
+                            "text",
                             "Attention!",
                             "Do you really want to save changes?",
                             savePage
                         )}
                     >Save
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-primary ml-3"
+                        onClick = {() => modalShow(
+                            "list",
+                            "Chose page",
+                            pageState.pageList,
+                            init
+                        )}
+                    >Open
                     </button>
                 </div>
             </nav>

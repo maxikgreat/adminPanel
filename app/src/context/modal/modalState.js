@@ -6,12 +6,14 @@ import {ModalContext} from "./modalContext";
 
 const initialState = {
     isVisible: false,
+    type: "text",
     headText: "",
-    bodyText: "",
+    body: "",
     acceptAction: null
 }
 
 export const ModalState = ({children}) => {
+
     const [state, dispatch]= useReducer(modalReducer, initialState)
 
     const hide = () => {
@@ -20,10 +22,10 @@ export const ModalState = ({children}) => {
         })
     }
 
-    const show = (headText, bodyText, acceptAction) => {
+    const show = (type, headText, body, acceptAction) => {
         dispatch({
             type: SHOW_MODAL,
-            payload: {headText, bodyText, acceptAction}
+            payload: {type, headText, body, acceptAction}
         })
     }
 

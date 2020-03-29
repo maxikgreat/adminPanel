@@ -5,8 +5,9 @@ const handlers = {
         {
             ...state,
             isVisible: true,
+            type: payload.type,
             headText: payload.headText,
-            bodyText: payload.bodyText,
+            body: payload.body,
             acceptAction: payload.acceptAction
         }
     )},
@@ -14,8 +15,9 @@ const handlers = {
         {
             ...state,
             isVisible: false,
+            type: "text",
             headText: "",
-            bodyText: "",
+            body: "",
             acceptAction: null
         }
     )},
