@@ -7,11 +7,14 @@ import TextEditor from "../textEditor/textEditor";
 //modal
 import ModalCustom from "../UI/modal";
 import {ModalContext} from "../../context/modal/modalContext";
+import AlertCustom from "../UI/alert";
+import {AlertContext} from "../../context/alert/alertContext";
 
 const Admin = () => {
 
     //context UI elements
-    const {show} = useContext(ModalContext)
+    const {modalShow} = useContext(ModalContext)
+    const {alertShow} = useContext(AlertContext)
 
     const _virtualDom = useRef(null);
 
@@ -55,7 +58,6 @@ const Admin = () => {
             const id = element.getAttribute("nodeid");
             //write changes from dirty copy to pure
             const virtualElement = _virtualDom.current.body.querySelector(`[nodeid="${id}"]`);
-
             new TextEditor(element, virtualElement)
         });
     };
@@ -75,6 +77,19 @@ const Admin = () => {
         document.querySelector("iframe").contentDocument.head.appendChild(style);
     };
 
+    const save = async () => {
+        const newDom = _virtualDom.current.cloneNode(_virtualDom.current);
+        DOMHelper.unWrappedTextNodes(newDom);
+        const html = DOMHelper.serializeDOMToString(newDom);
+        try{
+            await axios.post("./api/savePage.php", {
+                "pageName": currentPage,
+                html
+            }).then(() => alertShow('success', 'Success!', 'Your changes was saved'))
+        } catch (e) {
+            alertShow('danger', 'Error!', 'Some error')
+        }
+    };
 
     //pages functions
     const loadPageList = async () => {
@@ -92,7 +107,7 @@ const Admin = () => {
 
     const createNewPage = async () => {
         try{
-            const response = await axios.post('./api/createNewPage.php', {
+            await axios.post('./api/createNewPage.php', {
                 "name": pageState.newPageName
             });
             loadPageList()
@@ -103,26 +118,12 @@ const Admin = () => {
 
     const deletePage = async (page) => {
         try{
-            const response = await axios.post('./api/deletePage.php', {
+            await axios.post('./api/deletePage.php', {
                 "name": page
             });
             loadPageList()
         } catch (e) {
             alert("No page exists with this name")
-        }
-    };
-
-    const save = async () => {
-        const newDom = _virtualDom.current.cloneNode(_virtualDom.current);
-        DOMHelper.unWrappedTextNodes(newDom);
-        const html = DOMHelper.serializeDOMToString(newDom);
-        try{
-            const response = await axios.post("./api/savePage.php", {
-                "pageName": currentPage,
-                html
-            })
-        } catch (e) {
-            console.log(e.message)
         }
     };
 
@@ -141,16 +142,24 @@ const Admin = () => {
 
     return(
         <>
-            <nav className="navbar navbar-dark bg-light">
-                <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick = {() => show(
-                        "Attention!",
-                        "Do you really want to save changes?",
-                        save
-                    )}
-                >Save</button>
+            <nav className="navbar bg-light">
+                <div className="col-2">
+
+                </div>
+                <div className="col-6">
+                    <AlertCustom />
+                </div>
+                <div className="col-4">
+                    <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick = {() => modalShow(
+                            "Attention!",
+                            "Do you really want to save changes?",
+                            save
+                        )}
+                    >Save</button>
+                </div>
             </nav>
             <iframe src = {currentPage} frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
             <ModalCustom />

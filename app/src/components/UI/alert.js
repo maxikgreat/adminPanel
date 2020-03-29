@@ -1,31 +1,17 @@
-// import {Modal} from 'react-bootstrap'
-// import React, {useContext} from 'react'
+import {Alert} from 'react-bootstrap'
+import React, {useContext} from 'react'
+import {AlertContext} from "../../context/alert/alertContext";
 //
-// const AlertCustom = () => {
-//
-//     const {hide, }
-//
-//     return(
-//
-//     )
-// }
-// //     return(
-// //         <Alert show={alert} variant={type === 'success' ? 'success' : 'danger'}>
-// //             <Alert.Heading>{type.toUpperCase()}</Alert.Heading>
-// //             <p>
-// //                 {bodyText}
-// //             </p>
-// //             <hr />
-// //             <div className="d-flex justify-content-end">
-// //                 <butotn
-// //                     onClick={() => setAlertVisible(false)}
-// //                     variant={type === 'success' ? 'success' : 'danger'}
-// //                 >
-// //                     Close
-// //                 </butotn>
-// //             </div>
-// //         </Alert>
-// //     )
-// // };
-// //
-// export default AlertCustom
+const AlertCustom = () => {
+
+    const {alert} = useContext(AlertContext)
+
+    return(
+        <Alert show={alert.isVisible} variant={alert.type}>
+            <Alert.Heading>{alert.headText}</Alert.Heading>
+            <p>{alert.bodyText}</p>
+        </Alert>
+    )
+}
+
+export default AlertCustom

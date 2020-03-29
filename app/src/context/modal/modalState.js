@@ -28,7 +28,7 @@ export const ModalState = ({children}) => {
     }
 
     return(
-        <ModalContext.Provider value={{hide, show, modal: state}}>
+        <ModalContext.Provider value={{modalHide: hide, modalShow: show, modal: state}}>
             {children}
         </ModalContext.Provider>
     )

@@ -13,7 +13,10 @@ const handlers = {
     [HIDE_MODAL]: (state) => {return(
         {
             ...state,
-            isVisible: false
+            isVisible: false,
+            headText: "",
+            bodyText: "",
+            acceptAction: null
         }
     )},
     DEFAULT: state => state

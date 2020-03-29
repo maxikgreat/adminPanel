@@ -5,10 +5,10 @@ import {ModalContext} from "../../context/modal/modalContext";
 
 const ModalCustom = () => {
 
-    const {modal, hide} = useContext(ModalContext)
+    const {modal, modalHide} = useContext(ModalContext)
 
     return(
-        <Modal show={modal.isVisible} onHide={hide}>
+        <Modal show={modal.isVisible} onHide={modalHide}>
             <Modal.Header closeButton>
                 <Modal.Title>{modal.headText}</Modal.Title>
             </Modal.Header>
@@ -17,14 +17,14 @@ const ModalCustom = () => {
                 <button
                     type="button"
                     className="btn btn-danger"
-                    onClick = {hide}
+                    onClick = {modalHide}
                 >Cancel</button>
                 <button
                     type="button"
                     className="btn btn-primary"
                     onClick = {() => {
                         modal.acceptAction();
-                        hide();
+                        modalHide();
                     }}
                 >Accept</button>
             </Modal.Footer>
