@@ -26,6 +26,7 @@ const Admin = () => {
     const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
         pageList: [],
+        backupsList: [],
         newPageName: ""
     });
 
@@ -86,6 +87,10 @@ const Admin = () => {
             }
         `;
         document.querySelector("iframe").contentDocument.head.appendChild(style);
+    };
+
+    const loadBackupsList = () => {
+
     };
 
     const savePage = async () => {
@@ -186,9 +191,20 @@ const Admin = () => {
                         )}
                     >Open
                     </button>
+                    <button
+                        type="button"
+                        className="btn btn-danger ml-3"
+                        // onClick = {() => modalShow(
+                        //     "list",
+                        //     "Chose page",
+                        //     pageState.pageList,
+                        //     init
+                        // )}
+                    >Backup
+                    </button>
                 </div>
             </nav>
-            <iframe src = {currentPage} frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
+            <iframe src = "" frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
             <ModalCustom />
             {loader.isVisible ? <Loader/> : null}
         </>
