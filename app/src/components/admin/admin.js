@@ -4,17 +4,22 @@ import axios from 'axios';
 import '../../helpers/iframeLoader.js'
 import DOMHelper from "../../helpers/domHelper";
 import TextEditor from "../textEditor/textEditor";
-//modal
-import ModalCustom from "../UI/modal";
+//context
 import {ModalContext} from "../../context/modal/modalContext";
-import AlertCustom from "../UI/alert";
 import {AlertContext} from "../../context/alert/alertContext";
+//UI
+import ModalCustom from "../UI/modal";
+import AlertCustom from "../UI/alert";
+import {Spinner} from 'react-bootstrap'
+import {LoaderContext} from "../../context/loader/loaderContext";
+import Loader from "../UI/loader";
 
 const Admin = () => {
 
     //context UI elements
-    const {modalShow} = useContext(ModalContext)
-    const {alertShow} = useContext(AlertContext)
+    const {modalShow} = useContext(ModalContext);
+    const {alertShow} = useContext(AlertContext);
+    const {loaderShow, loaderHide, loader} = useContext(LoaderContext);
 
     const _virtualDom = useRef(null);
 
@@ -50,6 +55,7 @@ const Admin = () => {
             .then(() => frame.load('../temp.html')) //load dirty version to iframe
             .then(() => enableEditing(frame)) //enable editing
             .then(() => injectStyles()) //styles when editing
+            .then(() => loaderHide())
     };
 
     //edition functions
@@ -77,7 +83,8 @@ const Admin = () => {
         document.querySelector("iframe").contentDocument.head.appendChild(style);
     };
 
-    const save = async () => {
+    const savePage = async () => {
+        loaderShow();
         const newDom = _virtualDom.current.cloneNode(_virtualDom.current);
         DOMHelper.unWrappedTextNodes(newDom);
         const html = DOMHelper.serializeDOMToString(newDom);
@@ -85,10 +92,12 @@ const Admin = () => {
             await axios.post("./api/savePage.php", {
                 "pageName": currentPage,
                 html
-            }).then(() => alertShow('success', 'Success!', 'Your changes was saved'))
+            })
+            alertShow('success', 'Success!', 'Your changes was saved')
         } catch (e) {
             alertShow('danger', 'Error!', 'Some error')
         }
+        loaderHide();
     };
 
     //pages functions
@@ -156,13 +165,15 @@ const Admin = () => {
                         onClick = {() => modalShow(
                             "Attention!",
                             "Do you really want to save changes?",
-                            save
+                            savePage
                         )}
-                    >Save</button>
+                    >Save
+                    </button>
                 </div>
             </nav>
             <iframe src = {currentPage} frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
             <ModalCustom />
+            {loader.isVisible ? <Loader/> : null}
         </>
     )
 };
