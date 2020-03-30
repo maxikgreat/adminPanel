@@ -8,7 +8,6 @@
         mkdir("../backups/");
     }
 
-
     $backups = json_decode(file_get_contents("../backups/backups.json"));
     if(!is_array($backups)){
         $backups = [];

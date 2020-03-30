@@ -41,7 +41,6 @@ const Admin = () => {
         const frame = document.querySelector("iframe");
         open(page, frame)
         loadPageList();
-        loadBackupsList();
     };
 
     const open = async (page, frame = document.querySelector("iframe")) => {
@@ -61,7 +60,6 @@ const Admin = () => {
             .then(() => enableEditing(frame)) //enable editing
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
-
     };
 
     //edition functions
@@ -99,7 +97,7 @@ const Admin = () => {
             }})
         }
         catch(e){
-            console.log(e.message)
+            alertShow('danger', 'Error!', e.message)
         }
     };
 
@@ -114,7 +112,7 @@ const Admin = () => {
                 })
             }})
         } catch (e) {
-            console.log(e.message);
+            alertShow('danger', 'Error!', e.message)
         }
     };
 
@@ -130,7 +128,7 @@ const Admin = () => {
             })
             open(currentPage)
         } catch(e){
-            console.log(e.message)
+            alertShow('danger', 'Error!', e.message)
         }
         loaderHide()
     };
@@ -148,10 +146,10 @@ const Admin = () => {
             loadBackupsList();
             alertShow('success', 'Success!', 'Your changes was saved')
         } catch (e) {
-            alertShow('danger', 'Error!', 'Error with server')
+            alertShow('danger', 'Error!', e.message)
         }
         loaderHide();
-
+        loadBackupsList();
     };
 
     const renderPages = () => {
@@ -169,7 +167,6 @@ const Admin = () => {
 
     return(
         <>
-            {console.log(currentPage)}
             <nav className="navbar bg-light">
                 <div className="col-2">
                     <div className = "navbar-brand">
