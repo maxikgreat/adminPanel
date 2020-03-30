@@ -67,7 +67,6 @@ const ModalCustom = () => {
                     >Accept</button>
                 </Modal.Footer> : null
             }
-
         </Modal>
     )
 };
