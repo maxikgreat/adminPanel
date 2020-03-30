@@ -38,7 +38,6 @@ const Admin = () => {
         if(e){
             e.preventDefault();
         }
-        loaderShow();
         //const frame = document.querySelector("iframe");
         open(page, _workFrame);
         loadPageList();
@@ -46,7 +45,7 @@ const Admin = () => {
     };
 
     const open = (page) => {
-
+        loaderShow()
         setCurrentPage(page);
 
         axios.get(`../${page}?rnd=${Math.random()}`) //get pure page.html without js and others scripts
@@ -64,6 +63,7 @@ const Admin = () => {
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
         loadBackupsList();
+
     };
 
     //edition functions
@@ -128,14 +128,13 @@ const Admin = () => {
         if(e){
             e.preventDefault();
         }
-        loaderShow()
         axios.post("./api/restoreBackup.php", {
             "page": currentPage,
             "file": backup
         }).then(() => {
             open(currentPage)
+            alertShow("success", 'Success!', 'Restored from backup')
         })
-        loaderHide()
     }
 
     //pages functions
@@ -167,8 +166,7 @@ const Admin = () => {
 
     return(
         <>
-            {console.log(pageState)}
-            {console.log(currentPage)}
+            {console.log(loader)}
             <nav className="navbar bg-light">
                 <div className="col-2">
 
