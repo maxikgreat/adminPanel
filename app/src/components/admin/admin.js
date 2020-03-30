@@ -26,6 +26,7 @@ const Admin = () => {
     const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
         pageList: [],
+        backupsList: [],
         newPageName: ""
     });
 
@@ -41,6 +42,7 @@ const Admin = () => {
         //const frame = document.querySelector("iframe");
         open(page, _workFrame);
         loadPageList();
+        loadBackupsList();
     };
 
     const open = (page) => {
@@ -61,6 +63,7 @@ const Admin = () => {
             .then(() => enableEditing()) //enable editing
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
+        loadBackupsList();
     };
 
     //edition functions
@@ -103,41 +106,49 @@ const Admin = () => {
             alertShow('danger', 'Error!', 'Some error')
         }
         loaderHide();
+        loadBackupsList();
     };
+
+    const loadBackupsList = async () => {
+        try{
+            const response = await axios.get('./backups/backups.json')
+            console.log(response)
+            setPageState(pageState => {return{
+                ...pageState,
+                backupsList: response.data.filter(backup => {
+                    return backup.page === currentPage
+                })
+            }})
+        } catch(e){
+            console.log(e.message)
+        }
+    }
+
+    const restoreBackup = (e, backup) => {
+        if(e){
+            e.preventDefault();
+        }
+        loaderShow()
+        axios.post("./api/restoreBackup.php", {
+            "page": currentPage,
+            "file": backup
+        }).then(() => {
+            open(currentPage)
+        })
+        loaderHide()
+    }
 
     //pages functions
     const loadPageList = async () => {
         try{
             const response = await axios.get('./api/pageList.php');
-            setPageState({
+            setPageState(pageState => {return{
                 ...pageState,
                 pageList: response.data
-            })
+            }})
         }
         catch(e){
             console.log(e.message)
-        }
-    };
-
-    const createNewPage = async () => {
-        try{
-            await axios.post('./api/createNewPage.php', {
-                "name": pageState.newPageName
-            });
-            loadPageList()
-        } catch (e) {
-            alert("Page is already exists!")
-        }
-    };
-
-    const deletePage = async (page) => {
-        try{
-            await axios.post('./api/deletePage.php', {
-                "name": page
-            });
-            loadPageList()
-        } catch (e) {
-            alert("No page exists with this name")
         }
     };
 
@@ -156,6 +167,8 @@ const Admin = () => {
 
     return(
         <>
+            {console.log(pageState)}
+            {console.log(currentPage)}
             <nav className="navbar bg-light">
                 <div className="col-2">
 
@@ -192,8 +205,8 @@ const Admin = () => {
                         onClick = {() => modalShow(
                             "list",
                             "Chose backup",
-                            pageState.pageList,
-                            init
+                            pageState.backupsList,
+                            restoreBackup
                         )}
                     >Backup
                     </button>
