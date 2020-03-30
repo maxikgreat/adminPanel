@@ -15,10 +15,6 @@ const handlers = {
         {
             ...state,
             isVisible: false,
-            type: "text",
-            headText: "",
-            body: "",
-            acceptAction: null
         }
     )},
     DEFAULT: state => state

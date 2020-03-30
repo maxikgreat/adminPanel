@@ -42,9 +42,10 @@ const Admin = () => {
         const frame = document.querySelector("iframe");
         open(page, frame);
         loadPageList();
+        loadBackupsList();
     };
 
-    const open = (page, frame) => {
+    const open = (page, frame = document.querySelector("iframe")) => {
 
         setCurrentPage(page);
 
@@ -62,6 +63,8 @@ const Admin = () => {
             .then(() => enableEditing(frame)) //enable editing
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
+
+        loadBackupsList();
     };
 
     //edition functions
@@ -89,8 +92,49 @@ const Admin = () => {
         document.querySelector("iframe").contentDocument.head.appendChild(style);
     };
 
-    const loadBackupsList = () => {
+    //pages functions
+    const loadPageList = async () => {
+        try{
+            const response = await axios.get('./api/pageList.php');
+            setPageState(pageState => {return{
+                ...pageState,
+                pageList: response.data
+            }})
+        }
+        catch(e){
+            console.log(e.message)
+        }
+    };
 
+    const loadBackupsList = async () => {
+        try{
+            const response = await axios.get('./backups/backups.json')
+            setPageState(pageState => {return{
+                ...pageState,
+                backupsList: response.data.filter(backup => {
+                    return backup.page === currentPage
+                })
+            }})
+        } catch (e) {
+            console.log(e.message);
+        }
+    };
+
+    const restoreBackup = async (e, backup) => {
+        if(e){
+            e.preventDefault();
+        }
+        loaderShow()
+        try {
+            await axios.post("./api/restoreBackup.php", {
+                "page": currentPage,
+                "file": backup
+            })
+            open(currentPage)
+        } catch(e){
+            console.log(e.message)
+        }
+        loaderHide()
     };
 
     const savePage = async () => {
@@ -103,47 +147,13 @@ const Admin = () => {
                 "pageName": currentPage,
                 html
             })
+            loadBackupsList();
             alertShow('success', 'Success!', 'Your changes was saved')
         } catch (e) {
-            alertShow('danger', 'Error!', 'Some error')
+            alertShow('danger', 'Error!', 'Error with server')
         }
         loaderHide();
-    };
 
-    //pages functions
-    const loadPageList = async () => {
-        try{
-            const response = await axios.get('./api/pageList.php');
-            setPageState({
-                ...pageState,
-                pageList: response.data
-            })
-        }
-        catch(e){
-            console.log(e.message)
-        }
-    };
-
-    const createNewPage = async () => {
-        try{
-            await axios.post('./api/createNewPage.php', {
-                "name": pageState.newPageName
-            });
-            loadPageList()
-        } catch (e) {
-            alert("Page is already exists!")
-        }
-    };
-
-    const deletePage = async (page) => {
-        try{
-            await axios.post('./api/deletePage.php', {
-                "name": page
-            });
-            loadPageList()
-        } catch (e) {
-            alert("No page exists with this name")
-        }
     };
 
     const renderPages = () => {
@@ -161,6 +171,7 @@ const Admin = () => {
 
     return(
         <>
+            {console.log(pageState)}
             <nav className="navbar bg-light">
                 <div className="col-2">
 
@@ -194,12 +205,12 @@ const Admin = () => {
                     <button
                         type="button"
                         className="btn btn-danger ml-3"
-                        // onClick = {() => modalShow(
-                        //     "list",
-                        //     "Chose page",
-                        //     pageState.pageList,
-                        //     init
-                        // )}
+                        onClick = {() => modalShow(
+                            "list",
+                            "Chose page",
+                            pageState.backupsList,
+                            restoreBackup
+                        )}
                     >Backup
                     </button>
                 </div>

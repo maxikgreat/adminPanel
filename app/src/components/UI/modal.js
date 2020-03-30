@@ -14,15 +14,27 @@ const ModalCustom = () => {
             return(
                 <div className="list-group">
                     {modal.body.map((item, index) => {
-                        return <a
-                            key = {index}
-                            href = "#"
-                            className="list-group-item list-group-item-action"
-                            onClick = {(e) => {
-                                modal.acceptAction(e, item)
-                                modalHide()
-                            }}
-                        >{item}</a>
+                        if(item.time){ //for backups
+                            return <a
+                                key = {item.file}
+                                href = "#"
+                                className="list-group-item list-group-item-action"
+                                onClick = {(e) => {
+                                    modal.acceptAction(e, item.file)
+                                    modalHide()
+                                }}
+                            >Backup time: {item.time}</a>
+                        } else {
+                            return <a
+                                key = {index}
+                                href = "#"
+                                className="list-group-item list-group-item-action"
+                                onClick = {(e) => {
+                                    modal.acceptAction(e, item)
+                                    modalHide()
+                                }}
+                            >{item}</a>
+                        }
                     })}
                 </div>
             )
@@ -35,7 +47,7 @@ const ModalCustom = () => {
                 <Modal.Title>{modal.headText}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {modalContentType()}
+                {modal.body.length < 1 ? "Data not found!" : modalContentType()}
             </Modal.Body>
             {
                 modal.type !== 'list' ? <Modal.Footer>
@@ -54,7 +66,6 @@ const ModalCustom = () => {
                     >Accept</button>
                 </Modal.Footer> : null
             }
-
         </Modal>
     )
 };
