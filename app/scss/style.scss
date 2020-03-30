@@ -17,6 +17,14 @@ $secondary_color: #f8f9fa;
 nav{
   height: $panel_height;
   border-bottom: 1px solid $primary_color;
+  .navbar-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+    img{
+      height: $panel_height;
+      padding: 5px;
+    }
+  }
 }
 
 
@@ -36,6 +44,8 @@ nav{
     margin: 0;
   }
 }
+
+
 
 .loader-container {
   position: fixed;
