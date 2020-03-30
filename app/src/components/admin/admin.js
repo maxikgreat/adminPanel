@@ -7,10 +7,10 @@ import TextEditor from "../textEditor/textEditor";
 //context
 import {ModalContext} from "../../context/modal/modalContext";
 import {AlertContext} from "../../context/alert/alertContext";
+import {LoaderContext} from "../../context/loader/loaderContext";
 //UI
 import ModalCustom from "../UI/modal";
 import AlertCustom from "../UI/alert";
-import {LoaderContext} from "../../context/loader/loaderContext";
 import Loader from "../UI/loader";
 
 const Admin = () => {
@@ -32,7 +32,7 @@ const Admin = () => {
 
     useEffect(() => {
         init(null, currentPage);
-    }, []);
+    }, [currentPage]);
 
     const init = (e, page) => {
         if(e){
@@ -110,18 +110,18 @@ const Admin = () => {
     };
 
     const loadBackupsList = async () => {
-        try{
-            const response = await axios.get('./backups/backups.json')
-            console.log(response)
-            setPageState(pageState => {return{
-                ...pageState,
-                backupsList: response.data.filter(backup => {
-                    return backup.page === currentPage
+             await axios.get('./backups/backups.json')
+                .then((response) => {
+                    setPageState(pageState => {return{
+                        ...pageState,
+                        backupsList: response.data.filter(backup => {
+                            return backup.page === currentPage
+                        })
+                    }})
                 })
-            }})
-        } catch(e){
-            console.log(e.message)
-        }
+                 .catch(() => {
+                     alertShow("warning", "Warning!", "Backup file not exists yet")
+                 })
     }
 
     const restoreBackup = (e, backup) => {
