@@ -7,10 +7,10 @@ import TextEditor from "../textEditor/textEditor";
 //context
 import {ModalContext} from "../../context/modal/modalContext";
 import {AlertContext} from "../../context/alert/alertContext";
+import {LoaderContext} from "../../context/loader/loaderContext";
 //UI
 import ModalCustom from "../UI/modal";
 import AlertCustom from "../UI/alert";
-import {LoaderContext} from "../../context/loader/loaderContext";
 import Loader from "../UI/loader";
 
 const Admin = () => {
@@ -21,6 +21,7 @@ const Admin = () => {
     const {loaderShow, loaderHide, loader} = useContext(LoaderContext);
 
     const _virtualDom = useRef(null);
+    const _workFrame = useRef();
 
     const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
@@ -38,15 +39,17 @@ const Admin = () => {
             e.preventDefault();
         }
         loaderShow();
-        const frame = document.querySelector("iframe");
-        open(page, frame)
+        //const frame = document.querySelector("iframe");
+        open(page, _workFrame);
         loadPageList();
+        loadBackupsList();
     };
 
-    const open = async (page, frame = document.querySelector("iframe")) => {
+    const open = (page) => {
+
         setCurrentPage(page);
 
-        await axios.get(`../${page}?rnd=${Math.random()}`) //get pure page.html without js and others scripts
+        axios.get(`../${page}?rnd=${Math.random()}`) //get pure page.html without js and others scripts
             .then(res =>(DOMHelper.parseStrToDOM(res.data))) // convert string to dom structure
             .then(DOMHelper.wrapTextNodes) //wrap all text nodes with custom tags to editing
             .then(dom => {
@@ -55,16 +58,17 @@ const Admin = () => {
             })
             .then(DOMHelper.serializeDOMToString) //DOM -> STRING
             .then(html => axios.post('./api/saveTempPage.php', {html})) // create temp dirty page
-            .then(() => frame.load('../iwoc3fh38_09fksd.html')) //load dirty version to iframe
+            .then(() => _workFrame.current.load('../iwoc3fh38_09fksd.html')) //load dirty version to iframe
             .then(() => axios.post('./api/deleteTempPage.php'))
-            .then(() => enableEditing(frame)) //enable editing
+            .then(() => enableEditing()) //enable editing
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
+        loadBackupsList();
     };
 
     //edition functions
-    const enableEditing = (frame) => {
-        frame.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
+    const enableEditing = () => {
+        _workFrame.current.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
             const id = element.getAttribute("nodeid");
             //write changes from dirty copy to pure
             const virtualElement = _virtualDom.current.body.querySelector(`[nodeid="${id}"]`);
@@ -87,52 +91,6 @@ const Admin = () => {
         document.querySelector("iframe").contentDocument.head.appendChild(style);
     };
 
-    //pages functions
-    const loadPageList = async () => {
-        try{
-            const response = await axios.get('./api/pageList.php');
-            setPageState(pageState => {return{
-                ...pageState,
-                pageList: response.data
-            }})
-        }
-        catch(e){
-            alertShow('danger', 'Error!', e.message)
-        }
-    };
-
-    const loadBackupsList = async () => {
-        try{
-            const response = await axios.get('./backups/backups.json')
-            console.log("Page from loadbackup " + currentPage)
-            setPageState(pageState => {return{
-                ...pageState,
-                backupsList: response.data.filter(backup => {
-                    return backup.page === currentPage
-                })
-            }})
-        } catch (e) {
-            alertShow('danger', 'Error!', e.message)
-        }
-    };
-
-    const restoreBackup = async (e, backup) => {
-        if(e){
-            e.preventDefault();
-        }
-        loaderShow()
-        try {
-            await axios.post("./api/restoreBackup.php", {
-                "page": currentPage,
-                "file": backup
-            })
-            open(currentPage)
-        } catch(e){
-            alertShow('danger', 'Error!', e.message)
-        }
-        loaderHide()
-    };
-
     const savePage = async () => {
         loaderShow();
         const newDom = _virtualDom.current.cloneNode(_virtualDom.current);
@@ -143,13 +101,55 @@ const Admin = () => {
                 "pageName": currentPage,
                 html
             })
-            loadBackupsList();
             alertShow('success', 'Success!', 'Your changes was saved')
         } catch (e) {
-            alertShow('danger', 'Error!', e.message)
+            alertShow('danger', 'Error!', 'Some error')
         }
         loaderHide();
         loadBackupsList();
+    };
+
+    const loadBackupsList = async () => {
+             await axios.get('./backups/backups.json')
+                .then((response) => {
+                    setPageState(pageState => {return{
+                        ...pageState,
+                        backupsList: response.data.filter(backup => {
+                            return backup.page === currentPage
+                        })
+                    }})
+                })
+                 .catch(() => {
+                     alertShow("warning", "Warning!", "Backup file not exists yet")
+                 })
+    }
+
+    const restoreBackup = (e, backup) => {
+        if(e){
+            e.preventDefault();
+        }
+        loaderShow()
+        axios.post("./api/restoreBackup.php", {
+            "page": currentPage,
+            "file": backup
+        }).then(() => {
+            open(currentPage)
+        })
+        loaderHide()
+    }
+
+    //pages functions
+    const loadPageList = async () => {
+        try{
+            const response = await axios.get('./api/pageList.php');
+            setPageState(pageState => {return{
+                ...pageState,
+                pageList: response.data
+            }})
+        }
+        catch(e){
+            console.log(e.message)
+        }
     };
 
     const renderPages = () => {
@@ -167,11 +167,11 @@ const Admin = () => {
 
     return(
         <>
+            {console.log(pageState)}
+            {console.log(currentPage)}
             <nav className="navbar bg-light">
                 <div className="col-2">
-                    <div className = "navbar-brand">
-                        <img src='./assets/images/logoAdmin.png' alt="Admin logo"/>
-                    </div>
+
                 </div>
                 <div className="col-6">
                     <AlertCustom />
@@ -212,7 +212,7 @@ const Admin = () => {
                     </button>
                 </div>
             </nav>
-            <iframe src = "" frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
+            <iframe src = '' frameBorder="0" ref = {_workFrame}></iframe>  {/*from folder admin > main folder where located index.html*/}
             <ModalCustom />
             {loader.isVisible ? <Loader/> : null}
         </>
