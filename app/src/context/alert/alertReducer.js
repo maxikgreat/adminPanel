@@ -14,9 +14,6 @@ const handlers = {
         {
             ...state,
             isVisible: false,
-            type: 'success',
-            headText: '',
-            bodyText: ''
         }
     )},
     DEFAULT: state => state

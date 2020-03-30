@@ -10,7 +10,6 @@ import {AlertContext} from "../../context/alert/alertContext";
 //UI
 import ModalCustom from "../UI/modal";
 import AlertCustom from "../UI/alert";
-import {Spinner} from 'react-bootstrap'
 import {LoaderContext} from "../../context/loader/loaderContext";
 import Loader from "../UI/loader";
 
@@ -22,6 +21,7 @@ const Admin = () => {
     const {loaderShow, loaderHide, loader} = useContext(LoaderContext);
 
     const _virtualDom = useRef(null);
+    const _workFrame = useRef();
 
     const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
@@ -38,12 +38,12 @@ const Admin = () => {
             e.preventDefault();
         }
         loaderShow();
-        const frame = document.querySelector("iframe");
-        open(page, frame);
+        //const frame = document.querySelector("iframe");
+        open(page, _workFrame);
         loadPageList();
     };
 
-    const open = (page, frame) => {
+    const open = (page) => {
 
         setCurrentPage(page);
 
@@ -56,16 +56,16 @@ const Admin = () => {
             })
             .then(DOMHelper.serializeDOMToString) //DOM -> STRING
             .then(html => axios.post('./api/saveTempPage.php', {html})) // create temp dirty page
-            .then(() => frame.load('../iwoc3fh38_09fksd.html')) //load dirty version to iframe
+            .then(() => _workFrame.current.load('../iwoc3fh38_09fksd.html')) //load dirty version to iframe
             .then(() => axios.post('./api/deleteTempPage.php'))
-            .then(() => enableEditing(frame)) //enable editing
+            .then(() => enableEditing()) //enable editing
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
     };
 
     //edition functions
-    const enableEditing = (frame) => {
-        frame.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
+    const enableEditing = () => {
+        _workFrame.current.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
             const id = element.getAttribute("nodeid");
             //write changes from dirty copy to pure
             const virtualElement = _virtualDom.current.body.querySelector(`[nodeid="${id}"]`);
@@ -186,9 +186,20 @@ const Admin = () => {
                         )}
                     >Open
                     </button>
+                    <button
+                        type="button"
+                        className="btn btn-danger ml-3"
+                        onClick = {() => modalShow(
+                            "list",
+                            "Chose backup",
+                            pageState.pageList,
+                            init
+                        )}
+                    >Backup
+                    </button>
                 </div>
             </nav>
-            <iframe src = {currentPage} frameBorder="0"></iframe>  {/*from folder admin > main folder where located index.html*/}
+            <iframe src = '' frameBorder="0" ref = {_workFrame}></iframe>  {/*from folder admin > main folder where located index.html*/}
             <ModalCustom />
             {loader.isVisible ? <Loader/> : null}
         </>
