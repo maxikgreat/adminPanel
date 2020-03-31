@@ -37,12 +37,16 @@ const Admin = () => {
         newPageName: "",
     });
 
-    const prevAuth = usePrevious({auth});
+    const {backupsList} = pageState
+    const prevAuth = usePrevious({auth, backupsList});
 
     useEffect(() => {
         if(prevAuth){
             if(prevAuth.auth !== auth){
                 init(null, currentPage);
+            }
+            if(prevAuth.backupsList == backupsList){
+                loadBackupsList()
             }
         }
         checkAuth();
