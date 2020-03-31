@@ -46,7 +46,6 @@ const Admin = () => {
             }
         }
         checkAuth();
-        loadBackupsList();
     }, [currentPage, auth]);
 
     const checkAuth = () => {
@@ -83,17 +82,18 @@ const Admin = () => {
         if(auth){
             //const frame = document.querySelector("iframe");
             open(page, _workFrame);
-            loadPageList();
-            loadBackupsList();
+            loadPageList()
         }
 
     };
 
-    const open = (page) => {
+    const open = async (page) => {
+
         loaderShow()
         setCurrentPage(page);
 
-        axios.get(`../${page}?rnd=${Math.random()}`) //get pure page.html without js and others scripts
+
+        await axios.get(`../${page}?rnd=${Math.random()}`) //get pure page.html without js and others scripts
             .then(res =>(DOMHelper.parseStrToDOM(res.data))) // convert string to dom structure
             .then(DOMHelper.wrapTextNodes) //wrap all text nodes with custom tags to editing
             .then(DOMHelper.wrapImages) //wrap all images
@@ -105,11 +105,12 @@ const Admin = () => {
             .then(html => axios.post('./api/saveTempPage.php', {html})) // create temp dirty page
             .then(() => _workFrame.current.load('../iwoc3fh38_09fksd.html')) //load dirty version to iframe
             .then(() => axios.post('./api/deleteTempPage.php'))
+            .then(() => {
+                loadBackupsList(page);
+            })
             .then(() => enableEditing()) //enable editing
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
-        loadBackupsList();
-
     };
 
     //edition functions
@@ -160,22 +161,25 @@ const Admin = () => {
                 html
             })
             alertShow('success', 'Success!', 'Your changes was saved')
+            loadBackupsList(currentPage);
         } catch (e) {
             alertShow('danger', 'Error!', 'Some error')
         }
         loaderHide();
-        loadBackupsList();
     };
 
-    const loadBackupsList = async () => {
-             await axios.get('./backups/backups.json')
+    const loadBackupsList = (page = currentPage) => {
+            axios.get('./backups/backups.json')
                 .then((response) => {
-                    setPageState(pageState => {return{
+
+                    setPageState(pageState => {
+                        return{
                         ...pageState,
                         backupsList: response.data.filter(backup => {
-                            return backup.page === currentPage
+                            return backup.page === page
                         })
                     }})
+
                 })
                  .catch(() => {
                      alertShow("warning", "Warning!", "Backup file not exists yet")
