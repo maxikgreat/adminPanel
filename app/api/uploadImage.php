@@ -1,6 +1,9 @@
 
 <?php
-
+    if($_SESSION["auth"] != true){
+        header("HTTP/1.0 403 Forbidden");
+        die;
+    }
 
     if(file_exists($_FILES["image"]["tmp_name"]) && is_uploaded_file($_FILES["image"]["tmp_name"])){
 

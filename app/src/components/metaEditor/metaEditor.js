@@ -54,7 +54,6 @@ const MetaEditor = ({virtualDom, onClose}) => {
 
     return(
         <>
-            {console.log(meta)}
             <Modal.Body>
                 <div className="form-group">
                     <input

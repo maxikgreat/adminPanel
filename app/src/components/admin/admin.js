@@ -27,8 +27,10 @@ const Admin = () => {
     const _virtualDom = useRef(null);
     const _workFrame = useRef(null);
     //state
+
     const [currentPage, setCurrentPage] = useState("index.html");
     const [auth, setAuth] = useState(false);
+    const [passError, setPassError] = useState('');
     const [pageState, setPageState] = useState({
         pageList: [],
         backupsList: [],
@@ -39,9 +41,8 @@ const Admin = () => {
 
     useEffect(() => {
         if(prevAuth){
-            if(prevAuth.auth !== auth && prevAuth){
+            if(prevAuth.auth !== auth){
                 init(null, currentPage);
-                console.log("Was changed")
             }
         }
         checkAuth();
@@ -55,13 +56,23 @@ const Admin = () => {
     }
 
     const login = (pass) => {
-        if(pass.length > 5){
+        if(pass.length >= 5){
             axios.post('./api/login.php', {
                 "password": pass
             }).then((res) => {
                 setAuth(res.data.auth)
+                if(!auth){
+                    setPassError("Invalid password. Try again!")
+                }
             })
         }
+    }
+
+    const logout = () => {
+        axios.get('./api/logout.php')
+            .then(() => {
+                window.location.replace("/");
+            })
     }
 
     const init = (e, page) => {
@@ -193,31 +204,23 @@ const Admin = () => {
             }})
         }
         catch(e){
-            console.log(e.message)
+            console.log(e.message);
         }
-    };
-
-    const renderPages = () => {
-        return pageState.pageList.map((page, index) => {
-            return <h1
-                key={index}
-            >{page}
-            <a
-                href='#'
-                onClick={() => {deletePage(page)}}
-            >(x)</a>
-            </h1>
-        })
     };
 
     return(
         <>
             {
                 !auth
-                    ? <Login login={login}/>
+                    ? <Login login={login} passError = {passError}/>
                     :   <>
                         <nav className="navbar">
-                            <div className="col-6">
+                            <div className="col-1">
+                                <div className="logo-container">
+                                    <img src='./assets/images/logoAdmin.png' alt="AdminLogo"/>
+                                </div>
+                            </div>
+                            <div className="col-5">
                                 <AlertCustom />
                             </div>
                             <div className="col-6 d-flex justify-content-around">
@@ -264,6 +267,17 @@ const Admin = () => {
                                         restoreBackup
                                     )}
                                 >Backup
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick = {() => modalShow(
+                                        "text",
+                                        "Log Out",
+                                        "Are you sure?",
+                                        logout
+                                    )}
+                                >Log Out
                                 </button>
                             </div>
                         </nav>
