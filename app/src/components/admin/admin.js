@@ -167,13 +167,10 @@ const Admin = () => {
     return(
         <>
             <nav className="navbar">
-                <div className="col-2">
-
-                </div>
                 <div className="col-6">
                     <AlertCustom />
                 </div>
-                <div className="col-4">
+                <div className="col-6 d-flex justify-content-around">
                     <button
                         type="button"
                         className="btn btn-primary ml-3"
@@ -187,7 +184,7 @@ const Admin = () => {
                     </button>
                     <button
                         type="button"
-                        className="btn btn-primary ml-3"
+                        className="btn btn-primary"
                         onClick = {() => modalShow(
                             "list",
                             "Chose page",
@@ -198,7 +195,18 @@ const Admin = () => {
                     </button>
                     <button
                         type="button"
-                        className="btn btn-danger ml-3"
+                        className="btn btn-primary"
+                        onClick = {() => modalShow(
+                            "edit-meta",
+                            "Edit META-tags",
+                            _virtualDom,
+                            init
+                        )}
+                    >Change META
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-danger"
                         onClick = {() => modalShow(
                             "list",
                             "Chose backup",

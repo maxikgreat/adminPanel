@@ -2,8 +2,10 @@
 import React, {useContext} from "react";
 import {Modal} from 'react-bootstrap'
 import {ModalContext} from "../../context/modal/modalContext";
+import MetaEditor from "../metaEditor/metaEditor";
 
 const ModalCustom = () => {
+
 
     const {modal, modalHide} = useContext(ModalContext)
 
@@ -41,32 +43,52 @@ const ModalCustom = () => {
         }
     }
 
+    const checkModalType = () => {
+        if(modal.type !== 'edit-meta'){
+            return(
+                <>
+                    <Modal.Body>
+                        {
+                                modal.body.length < 1 ? "Data not found!" : modalContentType()
+                        }
+                    </Modal.Body>
+                    {
+                        modal.type !== 'list'
+                            ? <Modal.Footer>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick = {modalHide}
+                                >Cancel</button>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick = {() => {
+                                        modal.acceptAction();
+                                        modalHide();
+                                    }}
+                                >Accept</button>
+                            </Modal.Footer> : null
+                    }
+                </>
+            )
+        } else {
+            return(
+                <MetaEditor
+                    virtualDom={modal.body}
+                    onClose = {modalHide}
+                />
+            )
+        }
+    }
+
 
     return(
         <Modal show={modal.isVisible} onHide={modalHide}>
             <Modal.Header closeButton>
                 <Modal.Title>{modal.headText}</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-                {modal.body.length < 1 ? "Data not found!" : modalContentType()}
-            </Modal.Body>
-            {
-                modal.type !== 'list' ? <Modal.Footer>
-                    <button
-                        type="button"
-                        className="btn btn-danger"
-                        onClick = {modalHide}
-                    >Cancel</button>
-                    <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick = {() => {
-                            modal.acceptAction();
-                            modalHide();
-                        }}
-                    >Accept</button>
-                </Modal.Footer> : null
-            }
+            {checkModalType()}
         </Modal>
     )
 };

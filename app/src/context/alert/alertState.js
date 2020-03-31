@@ -20,18 +20,18 @@ export const AlertState = ({children}) => {
         dispatch({
             type: SHOW_ALERT,
             payload: {type, headText, bodyText}
-        })
-        // setTimeout(() => {
-        //     dispatch({
-        //         type: HIDE_ALERT
-        //     })
-        // }, 3000)
-    }
+        });
+        setTimeout(() => {
+            dispatch({
+                type: HIDE_ALERT
+            })
+        }, 3000)
+    };
 
     return(
         <AlertContext.Provider value = {{alertShow: autoShow, alert: state}}>
             {children}
         </AlertContext.Provider>
     )
-}
+};
 
