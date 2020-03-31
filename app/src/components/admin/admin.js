@@ -81,7 +81,7 @@ const Admin = () => {
             const id = element.getAttribute("editable-img-id");
             //write changes from dirty copy to pure
             const virtualElement = _virtualDom.current.body.querySelector(`[editable-img-id="${id}"]`);
-            new ImagesEditor(element, virtualElement)
+            new ImagesEditor(element, virtualElement, loaderShow, loaderHide, alertShow)
         });
     };
 
