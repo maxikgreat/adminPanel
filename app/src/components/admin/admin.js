@@ -5,6 +5,7 @@ import '../../helpers/iframeLoader.js'
 import DOMHelper from "../../helpers/domHelper";
 import TextEditor from "../textEditor/textEditor";
 import ImagesEditor from "../imagesEditor/imagesEditor";
+import Login from "../login/login";
 //context
 import {ModalContext} from "../../context/modal/modalContext";
 import {AlertContext} from "../../context/alert/alertContext";
@@ -13,6 +14,8 @@ import {LoaderContext} from "../../context/loader/loaderContext";
 import ModalCustom from "../UI/modal";
 import AlertCustom from "../UI/alert";
 import Loader from "../UI/loader";
+//hooks
+import usePrevious from "../../customHooks/usePrevious";
 
 const Admin = () => {
 
@@ -20,29 +23,58 @@ const Admin = () => {
     const {modalShow} = useContext(ModalContext);
     const {alertShow} = useContext(AlertContext);
     const {loaderShow, loaderHide, loader} = useContext(LoaderContext);
-
+    //refs
     const _virtualDom = useRef(null);
     const _workFrame = useRef(null);
-
+    //state
     const [currentPage, setCurrentPage] = useState("index.html");
+    const [auth, setAuth] = useState(false);
     const [pageState, setPageState] = useState({
         pageList: [],
         backupsList: [],
-        newPageName: ""
+        newPageName: "",
     });
 
+    const prevAuth = usePrevious({auth});
+
     useEffect(() => {
-        init(null, currentPage);
-    }, [currentPage]);
+        if(prevAuth){
+            if(prevAuth.auth !== auth && prevAuth){
+                init(null, currentPage);
+                console.log("Was changed")
+            }
+        }
+        checkAuth();
+    }, [currentPage, auth]);
+
+    const checkAuth = () => {
+        axios.get('./api/checkAuth.php')
+            .then(res => {
+                setAuth(res.data.auth)
+            })
+    }
+
+    const login = (pass) => {
+        if(pass.length > 5){
+            axios.post('./api/login.php', {
+                "password": pass
+            }).then((res) => {
+                setAuth(res.data.auth)
+            })
+        }
+    }
 
     const init = (e, page) => {
         if(e){
             e.preventDefault();
         }
-        //const frame = document.querySelector("iframe");
-        open(page, _workFrame);
-        loadPageList();
-        loadBackupsList();
+        if(auth){
+            //const frame = document.querySelector("iframe");
+            open(page, _workFrame);
+            loadPageList();
+            loadBackupsList();
+        }
+
     };
 
     const open = (page) => {
@@ -180,65 +212,72 @@ const Admin = () => {
 
     return(
         <>
-            <nav className="navbar">
-                <div className="col-6">
-                    <AlertCustom />
-                </div>
-                <div className="col-6 d-flex justify-content-around">
-                    <button
-                        type="button"
-                        className="btn btn-primary ml-3"
-                        onClick = {() => modalShow(
-                            "text",
-                            "Attention!",
-                            "Do you really want to save changes?",
-                            savePage
-                        )}
-                    >Save
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick = {() => modalShow(
-                            "list",
-                            "Chose page",
-                            pageState.pageList,
-                            init
-                        )}
-                    >Open
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick = {() => modalShow(
-                            "edit-meta",
-                            "Edit META-tags",
-                            _virtualDom,
-                            init
-                        )}
-                    >Change META
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-danger"
-                        onClick = {() => modalShow(
-                            "list",
-                            "Chose backup",
-                            pageState.backupsList,
-                            restoreBackup
-                        )}
-                    >Backup
-                    </button>
-                </div>
-            </nav>
-            <iframe src = '' frameBorder="0" ref = {_workFrame}></iframe>  {/*from folder admin > main folder where located index.html*/}
-            <input
-                id="img-upload"
-                type="file"
-                accept="image/*"
-                style={{display: 'none'}}
-            />
-            <ModalCustom />
+            {
+                !auth
+                    ? <Login login={login}/>
+                    :   <>
+                        <nav className="navbar">
+                            <div className="col-6">
+                                <AlertCustom />
+                            </div>
+                            <div className="col-6 d-flex justify-content-around">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary ml-3"
+                                    onClick = {() => modalShow(
+                                        "text",
+                                        "Attention!",
+                                        "Do you really want to save changes?",
+                                        savePage
+                                    )}
+                                >Save
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick = {() => modalShow(
+                                        "list",
+                                        "Chose page",
+                                        pageState.pageList,
+                                        init
+                                    )}
+                                >Open
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick = {() => modalShow(
+                                        "edit-meta",
+                                        "Edit META-tags",
+                                        _virtualDom,
+                                        init
+                                    )}
+                                >Change META
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick = {() => modalShow(
+                                        "list",
+                                        "Chose backup",
+                                        pageState.backupsList,
+                                        restoreBackup
+                                    )}
+                                >Backup
+                                </button>
+                            </div>
+                        </nav>
+                        <iframe src = '' frameBorder="0" ref = {_workFrame}></iframe>  {/*from folder admin > main folder where located index.html*/}
+                        <input
+                            id="img-upload"
+                            type="file"
+                            accept="image/*"
+                            style={{display: 'none'}}
+                        />
+                        <ModalCustom />
+                    </>
+            }
+
             {loader.isVisible ? <Loader/> : null}
         </>
     )
