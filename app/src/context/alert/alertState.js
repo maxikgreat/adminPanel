@@ -6,7 +6,7 @@ import alertReducer from "./alertReducer";
 
 const initialState = {
     isVisible: false,
-    type: 'success',
+    type: '',
     headText: '',
     bodyText: ''
 };
@@ -21,11 +21,11 @@ export const AlertState = ({children}) => {
             type: SHOW_ALERT,
             payload: {type, headText, bodyText}
         })
-        setTimeout(() => {
-            dispatch({
-                type: HIDE_ALERT
-            })
-        }, 3000)
+        // setTimeout(() => {
+        //     dispatch({
+        //         type: HIDE_ALERT
+        //     })
+        // }, 3000)
     }
 
     return(

@@ -21,7 +21,7 @@ const Admin = () => {
     const {loaderShow, loaderHide, loader} = useContext(LoaderContext);
 
     const _virtualDom = useRef(null);
-    const _workFrame = useRef();
+    const _workFrame = useRef(null);
 
     const [currentPage, setCurrentPage] = useState("index.html");
     const [pageState, setPageState] = useState({
@@ -166,8 +166,7 @@ const Admin = () => {
 
     return(
         <>
-            {console.log(loader)}
-            <nav className="navbar bg-light">
+            <nav className="navbar">
                 <div className="col-2">
 
                 </div>
