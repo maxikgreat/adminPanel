@@ -43,4 +43,18 @@ export default class DOMHelper {
         const serializer = new XMLSerializer();
         return serializer.serializeToString(dom);
     };
+
+    static wrapImages(dom){
+        dom.body.querySelectorAll("img").forEach((img, i) => {
+            img.setAttribute("editable-img-id", i)
+        });
+        return dom
+    }
+
+    static unWrapImages(dom){
+        dom.body.querySelectorAll("[editable-img-id]").forEach((img) => {
+            img.removeAttribute("editable-img-id")
+        });
+    }
+
 };

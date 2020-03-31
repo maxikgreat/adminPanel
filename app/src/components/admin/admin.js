@@ -4,6 +4,7 @@ import axios from 'axios';
 import '../../helpers/iframeLoader.js'
 import DOMHelper from "../../helpers/domHelper";
 import TextEditor from "../textEditor/textEditor";
+import ImagesEditor from "../imagesEditor/imagesEditor";
 //context
 import {ModalContext} from "../../context/modal/modalContext";
 import {AlertContext} from "../../context/alert/alertContext";
@@ -51,6 +52,7 @@ const Admin = () => {
         axios.get(`../${page}?rnd=${Math.random()}`) //get pure page.html without js and others scripts
             .then(res =>(DOMHelper.parseStrToDOM(res.data))) // convert string to dom structure
             .then(DOMHelper.wrapTextNodes) //wrap all text nodes with custom tags to editing
+            .then(DOMHelper.wrapImages) //wrap all images
             .then(dom => {
                 _virtualDom.current = dom; // SAVE PURE DOM STRUCTURE
                 return dom
@@ -74,6 +76,13 @@ const Admin = () => {
             const virtualElement = _virtualDom.current.body.querySelector(`[nodeid="${id}"]`);
             new TextEditor(element, virtualElement)
         });
+
+        _workFrame.current.contentDocument.body.querySelectorAll("[editable-img-id]").forEach(element => {
+            const id = element.getAttribute("editable-img-id");
+            //write changes from dirty copy to pure
+            const virtualElement = _virtualDom.current.body.querySelector(`[editable-img-id="${id}"]`);
+            new ImagesEditor(element, virtualElement)
+        });
     };
 
     const injectStyles = () => {
@@ -87,6 +96,10 @@ const Admin = () => {
                 outline: 3px solid red;
                 outline-offset: 8px;
             }
+            [editable-img-id]:hover {
+                outline: 3px solid orange;
+                outline-offset: 8px;
+            }
         `;
         document.querySelector("iframe").contentDocument.head.appendChild(style);
     };
@@ -95,6 +108,7 @@ const Admin = () => {
         loaderShow();
         const newDom = _virtualDom.current.cloneNode(_virtualDom.current);
         DOMHelper.unWrappedTextNodes(newDom);
+        DOMHelper.unWrapImages(newDom);
         const html = DOMHelper.serializeDOMToString(newDom);
         try{
             await axios.post("./api/savePage.php", {
@@ -218,6 +232,12 @@ const Admin = () => {
                 </div>
             </nav>
             <iframe src = '' frameBorder="0" ref = {_workFrame}></iframe>  {/*from folder admin > main folder where located index.html*/}
+            <input
+                id="img-upload"
+                type="file"
+                accept="image/*"
+                style={{display: 'none'}}
+            />
             <ModalCustom />
             {loader.isVisible ? <Loader/> : null}
         </>
