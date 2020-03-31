@@ -45,11 +45,9 @@ const Admin = () => {
             if(prevAuth.auth !== auth){
                 init(null, currentPage);
             }
-            if(prevAuth.backupsList == backupsList){
-                loadBackupsList()
-            }
         }
         checkAuth();
+        loadBackupsList();
     }, [currentPage, auth]);
 
     const checkAuth = () => {
