@@ -37,8 +37,7 @@ const Admin = () => {
         newPageName: "",
     });
 
-    const {backupsList} = pageState
-    const prevAuth = usePrevious({auth, backupsList});
+    const prevAuth = usePrevious({auth});
 
     useEffect(() => {
         if(prevAuth){
