@@ -6,6 +6,11 @@ import DOMHelper from "../../helpers/domHelper";
 import TextEditor from "../textEditor/textEditor";
 import ImagesEditor from "../imagesEditor/imagesEditor";
 import Login from "../login/login";
+import {Navbar} from 'react-bootstrap'
+//iconst
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faBars } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 //context
 import {ModalContext} from "../../context/modal/modalContext";
 import {AlertContext} from "../../context/alert/alertContext";
@@ -14,8 +19,11 @@ import {LoaderContext} from "../../context/loader/loaderContext";
 import ModalCustom from "../UI/modal";
 import AlertCustom from "../UI/alert";
 import Loader from "../UI/loader";
+import Buttons from "../UI/buttons";
 //hooks
 import usePrevious from "../../customHooks/usePrevious";
+
+library.add(faBars)
 
 const Admin = () => {
 
@@ -27,7 +35,7 @@ const Admin = () => {
     const _virtualDom = useRef(null);
     const _workFrame = useRef(null);
     //state
-
+    const [mobileNavVisible, setMobileNav] = useState(false);
     const [currentPage, setCurrentPage] = useState("index.html");
     const [auth, setAuth] = useState(false);
     const [passError, setPassError] = useState('');
@@ -218,74 +226,34 @@ const Admin = () => {
             {
                 !auth
                     ? <Login login={login} passError = {passError}/>
-                    :   <>
-                        <nav className="navbar">
+                    :
+                    <>
+                        <Navbar collapseOnSelect expand="lg">
                             <div className="col-1">
                                 <div className="logo-container">
                                     <img src='./assets/images/logoAdmin.png' alt="AdminLogo"/>
                                 </div>
                             </div>
-                            <div className="col-5">
-                                <AlertCustom />
-                            </div>
-                            <div className="col-6 d-flex justify-content-around">
-                                <button
-                                    type="button"
-                                    className="btn btn-primary ml-3"
-                                    onClick = {() => modalShow(
-                                        "text",
-                                        "Attention!",
-                                        "Do you really want to save changes?",
-                                        savePage
-                                    )}
-                                >Save
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick = {() => modalShow(
-                                        "list",
-                                        "Chose page",
-                                        pageState.pageList,
-                                        init
-                                    )}
-                                >Open
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick = {() => modalShow(
-                                        "edit-meta",
-                                        "Edit META-tags",
-                                        _virtualDom,
-                                        init
-                                    )}
-                                >Change META
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-danger"
-                                    onClick = {() => modalShow(
-                                        "list",
-                                        "Chose backup",
-                                        pageState.backupsList,
-                                        restoreBackup
-                                    )}
-                                >Backup
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-danger"
-                                    onClick = {() => modalShow(
-                                        "text",
-                                        "Log Out",
-                                        "Are you sure?",
-                                        logout
-                                    )}
-                                >Log Out
-                                </button>
-                            </div>
-                        </nav>
+                            <Navbar.Toggle aria-controls = "toggleNav">
+                                <FontAwesomeIcon icon={'bars'} />
+                            </Navbar.Toggle>
+                            <Navbar.Collapse className="col-11 row" id="toggleNav">
+                                <div className="col-6">
+                                    <AlertCustom />
+                                </div>
+                                <div className="col-6 d-flex justify-content-around p-0">
+                                    <Buttons
+                                        modalShow={modalShow}
+                                        savePage={savePage}
+                                        pageState={pageState}
+                                        init={init}
+                                        _virtualDom={_virtualDom}
+                                        restoreBackup={restoreBackup}
+                                        logout={logout}
+                                    />
+                                </div>
+                            </Navbar.Collapse>
+                        </Navbar>
                         <iframe src = '' frameBorder="0" ref = {_workFrame}></iframe>  {/*from folder admin > main folder where located index.html*/}
                         <input
                             id="img-upload"

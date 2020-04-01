@@ -91,7 +91,7 @@ input[type="password"] {
 
 
 
-//MAIN-FRAME----------------------
+//----------------MAIN-FRAME----------------------
 iframe {
   position: absolute;
   top: $panel_height;
@@ -99,3 +99,5 @@ iframe {
   width: 100%;
   height: calc(100vh - #{$panel_height});
 }
+
+@import '_respo.scss';
