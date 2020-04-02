@@ -1,9 +1,4 @@
    <?php
-    session_start();
-    if($_SESSION["auth"] != true){
-        header("HTTP/1.0 403 Forbidden");
-        die;
-    }
 
     $_POST = json_decode( file_get_contents("php://input"), true );
     
@@ -23,7 +18,7 @@
         $backupFN = uniqid() . ".html";
     
         copy("../../" . $file, "../backups/" . $backupFN );
-        array_push($backups, ["page" => $file, "file" => $backupFN, "time" => date("H:i:s d:m:Y")]);
+        array_push($backups, ["page" => $file, "file" => $backupFN, "time" => date("H:i:s d.m.Y")]);
         file_put_contents("../backups/backups.json", json_encode( $backups ));
         file_put_contents("../../" . $file, $newHTML);
 

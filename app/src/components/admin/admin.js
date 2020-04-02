@@ -7,7 +7,7 @@ import TextEditor from "../textEditor/textEditor";
 import ImagesEditor from "../imagesEditor/imagesEditor";
 import Login from "../login/login";
 import {Navbar} from 'react-bootstrap'
-//iconst
+//icons
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -23,7 +23,7 @@ import Buttons from "../UI/buttons";
 //hooks
 import usePrevious from "../../customHooks/usePrevious";
 
-library.add(faBars)
+library.add(faBars);
 
 const Admin = () => {
 
@@ -35,7 +35,6 @@ const Admin = () => {
     const _virtualDom = useRef(null);
     const _workFrame = useRef(null);
     //state
-    const [mobileNavVisible, setMobileNav] = useState(false);
     const [currentPage, setCurrentPage] = useState("index.html");
     const [auth, setAuth] = useState(false);
     const [passError, setPassError] = useState('');
@@ -88,7 +87,6 @@ const Admin = () => {
             e.preventDefault();
         }
         if(auth){
-            //const frame = document.querySelector("iframe");
             open(page, _workFrame);
             loadPageList()
         }
@@ -114,6 +112,7 @@ const Admin = () => {
             .then(() => _workFrame.current.load('../iwoc3fh38_09fksd.html')) //load dirty version to iframe
             .then(() => axios.post('./api/deleteTempPage.php'))
             .then(() => {
+                console.log("Load backups from " + page);
                 loadBackupsList(page);
             })
             .then(() => enableEditing()) //enable editing
@@ -176,10 +175,9 @@ const Admin = () => {
         loaderHide();
     };
 
-    const loadBackupsList = (page = currentPage) => {
+    const loadBackupsList = (page) => {
             axios.get('./backups/backups.json')
                 .then((response) => {
-
                     setPageState(pageState => {
                         return{
                         ...pageState,
@@ -190,7 +188,7 @@ const Admin = () => {
 
                 })
                  .catch(() => {
-                     alertShow("warning", "Warning!", "Backup file not exists yet")
+                     alertShow("warning", "Warning!", "Backup files not exist yet")
                  })
     }
 
