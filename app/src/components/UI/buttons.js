@@ -6,7 +6,7 @@ const Buttons = ({modalShow, savePage, pageState, init, _virtualDom, restoreBack
         <>
             <button
                 type="button"
-                className="btn btn-primary ml-3"
+                className="btn btn-primary"
                 onClick = {() => modalShow(
                     "text",
                     "Attention!",

@@ -1,7 +1,50 @@
 
 
-//@include media-breakpoint-up(xs) {
-//  button.btn {
-//    padding: 5px;
-//  }
-//}
+@include media-breakpoint-down(md) {
+  nav{
+    .mobile-alert{
+      display: block;
+    }
+  }
+  .navbar{
+    height: auto;
+
+  }
+  .navbar-collapse{
+    min-width: 100%;
+    flex-direction: column-reverse;
+    div{
+      min-width: 100vw;
+      flex-direction: column;
+    }
+    div.alert{
+      display: none;
+    }
+  }
+
+  button{
+    padding: 10px;
+  }
+  iframe{
+    position: relative;
+    top: unset;
+  }
+}
+
+@include media-breakpoint-down(xs) {
+  nav{
+    .logo-hld{
+      display: none;
+    }
+    .mobile-alert{
+      .alert{
+        div.h4{
+          font-size: 16px;
+        }
+        p{
+          font-size: 9px;
+        }
+      }
+    }
+  }
+}

@@ -229,10 +229,13 @@ const Admin = () => {
                     :
                     <>
                         <Navbar collapseOnSelect expand="lg">
-                            <div className="col-1">
+                            <div className="col-1 logo-hld">
                                 <div className="logo-container">
                                     <img src='./assets/images/logoAdmin.png' alt="AdminLogo"/>
                                 </div>
+                            </div>
+                            <div className="mobile-alert">
+                                <AlertCustom />
                             </div>
                             <Navbar.Toggle aria-controls = "toggleNav">
                                 <FontAwesomeIcon icon={'bars'} />
