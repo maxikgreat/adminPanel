@@ -2,11 +2,16 @@ const path = require('path');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = !isDev;
 
-const dist = path.resolve('/Applications/MAMP/htdocs/example/', 'webpack');
+let dist = path.resolve('/Applications/MAMP/htdocs/example/', 'webpack-dev');
+
+if (isProd) {
+    dist = path.resolve('/Applications/MAMP/htdocs/example/', 'webpack-build');
+}
 
 const filename = extension => isDev ? `[name].${extension}` : `[name].[hash].${extension}`;
 
@@ -64,7 +69,13 @@ module.exports = {
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
             filename: filename('css')
-        })
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+              { from: './api', to: `${dist}/api`},
+              { from: './assets', to: `${dist}/assets`}
+            ],
+          }),
     ],
     module: {
         rules: [
