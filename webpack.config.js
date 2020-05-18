@@ -1,9 +1,14 @@
 const path = require('path');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = !isDev;
+
+const dist = path.resolve('/Applications/MAMP/htdocs/example/', 'webpack');
+
+const filename = extension => isDev ? `[name].${extension}` : `[name].[hash].${extension}`;
 
 const babelOptions = preset => {
     // default options
@@ -23,6 +28,22 @@ const babelOptions = preset => {
     return options;
 }
 
+const cssLoaders = extra => {
+    const loaders = [{
+        loader: MiniCssExtractPlugin.loader,
+        options: {
+            hmr: isDev,
+            reloadAll: true
+        }
+    }, 'css-loader'];
+
+    if (extra) {
+        loaders.push(extra);
+    }
+
+    return loaders;
+}
+
 module.exports = {
     context: path.resolve(__dirname, 'app'),
     mode: 'development', 
@@ -30,8 +51,8 @@ module.exports = {
         main: './src/main.js'
     },
     output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist'),
+        filename: filename('js'),
+        path: path.resolve(dist),
     },
     plugins: [
         new HTMLWebpackPlugin({
@@ -40,7 +61,10 @@ module.exports = {
                 collapseWhitespace: isProd
             }
         }),
-        new CleanWebpackPlugin()
+        new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin({
+            filename: filename('css')
+        })
     ],
     module: {
         rules: [
@@ -51,6 +75,10 @@ module.exports = {
                     loader: 'babel-loader',
                     options: babelOptions('@babel/preset-react')
                 }
+            },
+            {
+                test: /\.s[ac]ss$/,
+                use: cssLoaders('sass-loader')
             }
         ]
     }
