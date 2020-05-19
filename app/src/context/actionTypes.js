@@ -9,3 +9,7 @@ export const HIDE_ALERT = "HIDE_ALERT"
 //loader
 export const SHOW_LOADER = "SHOW_LOADER"
 export const HIDE_LOADER = "HIDE_LOADER"
+
+//submenu
+export const SHOW_SUBMENU = "SHOW_SUBMENU"
+export const HIDE_SUBMENU = "HIDE_SUBMENU"

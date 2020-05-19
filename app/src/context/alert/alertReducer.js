@@ -1,21 +1,17 @@
 import {HIDE_ALERT, SHOW_ALERT} from "../actionTypes";
 
 const handlers = {
-    [SHOW_ALERT]: (state, {payload}) => {return(
-        {
-            ...state,
-            isVisible: true,
-            type: payload.type,
-            headText: payload.headText,
-            bodyText: payload.bodyText
-        }
-    )},
-    [HIDE_ALERT]: (state) => {return(
-        {
-            ...state,
-            isVisible: false,
-        }
-    )},
+    [SHOW_ALERT]: (state, {payload}) => ({
+        ...state,
+        isVisible: true,
+        type: payload.type,
+        headText: payload.headText,
+        bodyText: payload.bodyText
+    }),
+    [HIDE_ALERT]: state => ({
+        ...state,
+        isVisible: false,
+    }),
     DEFAULT: state => state
 }
 

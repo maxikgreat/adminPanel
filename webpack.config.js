@@ -66,7 +66,6 @@ module.exports = {
                 collapseWhitespace: isProd
             }
         }),
-        new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
             filename: filename('css')
         }),
@@ -75,7 +74,7 @@ module.exports = {
               { from: './api', to: `${dist}/api`},
               { from: './assets', to: `${dist}/assets`}
             ],
-          }),
+        }),
     ],
     module: {
         rules: [

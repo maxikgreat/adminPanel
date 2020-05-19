@@ -2,18 +2,14 @@
 import {SHOW_LOADER, HIDE_LOADER} from "../actionTypes";
 
 const handlers = {
-    [SHOW_LOADER]: (state) => {return(
-        {
-            ...state,
-            isVisible: true
-        }
-    )},
-    [HIDE_LOADER]: (state) => {return(
-        {
-            ...state,
-            isVisible: false
-        }
-    )},
+    [SHOW_LOADER]: state => ({
+        ...state,
+        isVisible: true
+    }),
+    [HIDE_LOADER]: state => ({
+        ...state,
+        isVisible: false
+    }),
     DEFAULT: state => state
 }
 

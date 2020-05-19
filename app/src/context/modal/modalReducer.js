@@ -1,22 +1,18 @@
 import {SHOW_MODAL, HIDE_MODAL} from "../actionTypes";
 
 const handlers = {
-    [SHOW_MODAL]: (state, {payload}) => {return(
-        {
-            ...state,
-            isVisible: true,
-            type: payload.type,
-            headText: payload.headText,
-            body: payload.body,
-            acceptAction: payload.acceptAction
-        }
-    )},
-    [HIDE_MODAL]: (state) => {return(
-        {
-            ...state,
-            isVisible: false,
-        }
-    )},
+    [SHOW_MODAL]: (state, {payload}) => ({
+        ...state,
+        isVisible: true,
+        type: payload.type,
+        headText: payload.headText,
+        body: payload.body,
+        acceptAction: payload.acceptAction
+    }),
+    [HIDE_MODAL]: state => ({
+        ...state,
+        isVisible: false,
+    }),
     DEFAULT: state => state
 }
 

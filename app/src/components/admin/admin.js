@@ -1,10 +1,12 @@
 
 import React, {useState, useEffect, useRef, useContext} from 'react'
+import ReactDOM from 'react-dom'
 import axios from 'axios';
 import '../../helpers/iframeLoader.js'
 import DOMHelper from "../../helpers/domHelper";
 import TextEditor from "../textEditor/textEditor";
 import ImagesEditor from "../imagesEditor/imagesEditor";
+import SubmenuCustom from "../submenu/submenu";
 import Login from "../login/login";
 import {Navbar} from 'react-bootstrap'
 //icons
@@ -15,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {ModalContext} from "../../context/modal/modalContext";
 import {AlertContext} from "../../context/alert/alertContext";
 import {LoaderContext} from "../../context/loader/loaderContext";
+import {SubmenuContext} from "../../context/submenu/submenuContext";
 //UI
 import ModalCustom from "../UI/modal";
 import AlertCustom from "../UI/alert";
@@ -31,6 +34,7 @@ const Admin = () => {
     const {modalShow} = useContext(ModalContext);
     const {alertShow} = useContext(AlertContext);
     const {loaderShow, loaderHide, loader} = useContext(LoaderContext);
+    const {showSubmenu, hideSubmenu} = useContext(SubmenuContext);
     //refs
     const _virtualDom = useRef(null);
     const _workFrame = useRef(null);
@@ -98,11 +102,15 @@ const Admin = () => {
         loaderShow()
         setCurrentPage(page);
 
-
         await axios.get(`../${page}?rnd=${Math.random()}`) //get pure page.html without js and others scripts
             .then(res =>(DOMHelper.parseStrToDOM(res.data))) // convert string to dom structure
             .then(DOMHelper.wrapTextNodes) //wrap all text nodes with custom tags to editing
             .then(DOMHelper.wrapImages) //wrap all images
+            .then(dom => {
+                insertSubmenu(dom)
+                //console.log(dom);
+                return dom
+            })
             .then(dom => {
                 _virtualDom.current = dom; // SAVE PURE DOM STRUCTURE
                 return dom
@@ -111,14 +119,18 @@ const Admin = () => {
             .then(html => axios.post('./api/saveTempPage.php', {html})) // create temp dirty page
             .then(() => _workFrame.current.load('../iwoc3fh38_09fksd.html')) //load dirty version to iframe
             .then(() => axios.post('./api/deleteTempPage.php'))
-            .then(() => {
-                console.log("Load backups from " + page);
-                loadBackupsList(page);
-            })
+            .then(() => loadBackupsList(page))
             .then(() => enableEditing()) //enable editing
             .then(() => injectStyles()) //styles when editing
             .then(() => loaderHide())
     };
+
+    //insert submenu into iframe
+    const insertSubmenu = (dom) => {
+        const submenuContainer = document.createElement('div');
+        dom.body.insertBefore(submenuContainer, dom.body.childNodes[0]);
+        console.log(dom)
+    }
 
     //edition functions
     const enableEditing = () => {
@@ -135,6 +147,26 @@ const Admin = () => {
             const virtualElement = _virtualDom.current.body.querySelector(`[editable-img-id="${id}"]`);
             new ImagesEditor(element, virtualElement, loaderShow, loaderHide, alertShow)
         });
+
+        const workFrameContent = _workFrame.current.contentDocument;
+
+        workFrameContent.addEventListener('mouseup', (e) => {
+            if(workFrameContent.getSelection().toString() !== '') {
+                showSubmenu(e.clientX, e.clientY);
+                workFrameContent.body.style.overflow = 'hidden';
+            } else {
+                hideSubmenu();
+                workFrameContent.body.style.overflow = 'scroll';
+            }
+        });
+
+
+
+
+        // TODO double click too
+        // _workFrame.current.contentDocument.addEventListener('dblclick', () => {
+        //     console.log('DOUBLE CLICKED WITH SELECTION', _workFrame.current.contentDocument.getSelection().toString());
+        // });
     };
 
     const injectStyles = () => {
@@ -263,6 +295,7 @@ const Admin = () => {
                             style={{display: 'none'}}
                         />
                         <ModalCustom />
+                        <SubmenuCustom />
                     </>
             }
 
