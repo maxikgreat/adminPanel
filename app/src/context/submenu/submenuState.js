@@ -8,7 +8,9 @@ export const SubmenuState = ({children}) => {
     const initialState = {
         visible: false,
         coordX: 0,
-        coordY: 0
+        coordY: 0,
+        textOpts: ['bold', 'italic'],
+        colorOpts: ['#ee6178', '#f7ba6b', '#aa65f7', '#45a5ac', '#b8f547']
     };
 
     const [state, dispatch] = useReducer(submenuReducer, initialState);

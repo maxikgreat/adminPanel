@@ -122,10 +122,12 @@ const Admin = () => {
     };
 
     const stopScrolling = () => {
+        console.log("STOP SCROLL")
         _workFrame.current.contentDocument.body.style.overflow = "hidden";
     };
 
     const enableScrolling = () => {
+        console.log("ENABLE SCROLLING")
         _workFrame.current.contentDocument.body.style.overflow = "scroll";
     };
 
@@ -167,22 +169,6 @@ const Admin = () => {
                     alertShow
                 );
             });
-
-        // workFrameContent.addEventListener('mouseup', (e) => {
-        //     if(workFrameContent.getSelection().toString() !== '') {
-        //         console.log(workFrameContent.getSelection().toString())
-        //         showSubmenu(e.clientX, e.clientY);
-        //         workFrameContent.body.style.overflow = 'hidden';
-        //     } else {
-        //         hideSubmenu();
-        //         workFrameContent.body.style.overflow = 'scroll';
-        //     }
-        // });
-
-        // TODO double click too
-        // _workFrame.current.contentDocument.addEventListener('dblclick', () => {
-        //     console.log('DOUBLE CLICKED WITH SELECTION', _workFrame.current.contentDocument.getSelection().toString());
-        // });
     };
 
     const injectStyles = () => {

@@ -14,7 +14,7 @@ export default class TextEditor{
         this.hideSubmenu = hideSubmenu;
         this.stopScrolling = stopScrolling;
         this.enableScrolling = enableScrolling;
-        this.element.addEventListener('mousedown', () => this.onClick());
+        this.element.addEventListener('click', (e) => this.onClick(e));
         this.element.addEventListener('blur', () => this.onBlur());
         this.element.addEventListener('keypress', (e) => this.onKeyPress(e));
         this.element.addEventListener('input', () => this.onTextEdit());
@@ -23,7 +23,8 @@ export default class TextEditor{
         }
     }
 
-    onClick(){
+    onClick(e){
+        e.preventDefault();
         this.stopScrolling();
         this.element.contentEditable = true;
         this.element.focus();

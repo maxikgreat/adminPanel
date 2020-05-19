@@ -16,25 +16,41 @@ const SubmenuCustom = () => {
     }
 
     const onSwitchOpt = (e) => {
-        e.preventDefault();
         e.target.classList.toggle("active");
     };
 
-    function renderOptions() {
-        return ["bold", "italic", "palette"].map((item, index) => {
+    function renderTextOptions() {
+        return submenu.textOpts.map((item, index) => {
             return (
                 <FontAwesomeIcon
                     key={index}
                     icon={item}
-                    onMouseDown={(e) => onSwitchOpt(e)}
+                    onClick={(e) => onSwitchOpt(e)}
                 />
             );
         });
     }
 
+    function renderColorOptions() {
+        return submenu.colorOpts.map((item, index) => {
+            return (
+                <div 
+                    key={index}
+                    className="pick-color" 
+                    style={{color: item}}
+                >
+                </div>
+            )
+        })
+    }
+
     return (
-        <div className='submenu-container' style={containerStyles}>
-            {renderOptions()}
+        <div 
+            className='submenu-container' 
+            style={containerStyles}
+            onMouseDown={e => e.preventDefault()}
+        >
+            {renderTextOptions()}
         </div>
     );
 };
