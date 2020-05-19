@@ -14,6 +14,7 @@ import {
     faBold,
     faItalic,
     faPalette,
+    faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //context
@@ -29,7 +30,7 @@ import Buttons from "../UI/buttons";
 //hooks
 import usePrevious from "../../customHooks/usePrevious";
 
-library.add(faBars, faBold, faItalic, faPalette);
+library.add(faBars, faBold, faItalic, faPalette, faLink);
 
 const Admin = () => {
     //context UI elements
@@ -134,6 +135,12 @@ const Admin = () => {
     //edition functions
     const enableEditing = () => {
         const workFrameContent = _workFrame.current.contentDocument;
+        workFrameContent.body.addEventListener('click', e => {
+            e.preventDefault();
+            if(e.target.nodeName !== 'TEXT-EDITOR') {
+                hideSubmenu();
+            }
+        })
 
         workFrameContent.body
             .querySelectorAll("text-editor")
@@ -308,7 +315,7 @@ const Admin = () => {
                         style={{ display: "none" }}
                     />
                     <ModalCustom />
-                    <SubmenuCustom />
+                    <SubmenuCustom workspace={_workFrame.current}/>
                 </>
             )}
 

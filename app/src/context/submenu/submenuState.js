@@ -9,7 +9,7 @@ export const SubmenuState = ({children}) => {
         visible: false,
         coordX: 0,
         coordY: 0,
-        textOpts: ['bold', 'italic'],
+        textOpts: ['bold', 'italic', 'link'],
         colorOpts: ['#ee6178', '#f7ba6b', '#aa65f7', '#45a5ac', '#b8f547']
     };
 

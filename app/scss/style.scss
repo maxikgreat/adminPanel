@@ -35,17 +35,32 @@ nav{
 .submenu-container {
   background-color: #fff;
   padding: 10px;
+  display: flex;
+  align-items: center;
+  border: 2px solid $primary;
   svg {
     cursor: pointer;
     padding: 3px;
     font-size: 30px;
     margin: 0 5px 0 5px;
   }
-  .active {
-    color: $danger;
-  }
   .pick-color {
-    width: 5px;
+    cursor: pointer;
+    display: inline-block;
+    height: 22px;
+    width: 25px;
+    margin: 0 2px 0 2px;
+  }
+  .input-group-prepend {
+    margin-left: 10px;
+    #inputGroupPrepend {
+      padding: 1px 5px 1px 5px;
+      font-size: 14px;
+    }
+  }
+  input {
+    padding: 0;
+    height: auto;
   }
 }
 

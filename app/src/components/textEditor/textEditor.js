@@ -25,6 +25,7 @@ export default class TextEditor{
 
     onClick(e){
         e.preventDefault();
+        e.stopPropagation();
         this.stopScrolling();
         this.element.contentEditable = true;
         this.element.focus();
@@ -37,7 +38,7 @@ export default class TextEditor{
     onBlur(){
         this.enableScrolling();
         this.element.removeAttribute('contenteditable');
-        this.hideSubmenu();
+        //this.hideSubmenu();
     }
 
     onKeyPress(e){
