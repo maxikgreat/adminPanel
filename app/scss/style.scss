@@ -32,8 +32,19 @@ nav{
   }
 }
 
-
-
+.submenu-container {
+  background-color: #fff;
+  padding: 10px;
+  svg {
+    cursor: pointer;
+    padding: 3px;
+    font-size: 30px;
+    margin: 0 5px 0 5px;
+  }
+  .active {
+    color: $danger;
+  }
+}
 
 //UI COMPONENTS--------------------
 .alert {

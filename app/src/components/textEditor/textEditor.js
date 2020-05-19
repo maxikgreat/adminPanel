@@ -1,9 +1,20 @@
 
 export default class TextEditor{
-    constructor(element, virtualElement){
+    constructor(
+        element, 
+        virtualElement, 
+        showSubmenu,
+        hideSubmenu,
+        stopScrolling,
+        enableScrolling
+    ){
         this.element = element;
         this.virtualElement = virtualElement;
-        this.element.addEventListener('click', () => this.onClick());
+        this.showSubmenu = showSubmenu;
+        this.hideSubmenu = hideSubmenu;
+        this.stopScrolling = stopScrolling;
+        this.enableScrolling = enableScrolling;
+        this.element.addEventListener('mousedown', () => this.onClick());
         this.element.addEventListener('blur', () => this.onBlur());
         this.element.addEventListener('keypress', (e) => this.onKeyPress(e));
         this.element.addEventListener('input', () => this.onTextEdit());
@@ -13,12 +24,19 @@ export default class TextEditor{
     }
 
     onClick(){
+        this.stopScrolling();
         this.element.contentEditable = true;
         this.element.focus();
+        this.showSubmenu(
+            this.element.getBoundingClientRect().left,
+            this.element.getBoundingClientRect().top
+        );
     }
 
     onBlur(){
+        this.enableScrolling();
         this.element.removeAttribute('contenteditable');
+        this.hideSubmenu();
     }
 
     onKeyPress(e){
