@@ -23,6 +23,7 @@ const SubmenuCustom = ({workspace}) => {
                 break;
             case 'italic':
                 workspace.contentDocument.execCommand('italic');
+                break;
             default:
                 console.log("default opt");
                 return;
@@ -37,6 +38,7 @@ const SubmenuCustom = ({workspace}) => {
     const onColorChange = (e) => {
         let hash = `#${e.target.value}`;
         if(/^#([0-9A-F]{3}){1,2}$/i.test(hash)) {
+            console.log(workspace.contentDocument.designMode);
             onColorClick(hash);
         }
     }
@@ -73,19 +75,34 @@ const SubmenuCustom = ({workspace}) => {
             style={containerStyles}
             onMouseDown={e => e.preventDefault()}
         >
-            {renderTextOptions()}
-            {renderColorOptions()}
-            <InputGroup.Prepend>
-                <InputGroup.Text id="inputGroupPrepend">#</InputGroup.Text>
-            </InputGroup.Prepend>
-            <Form.Control
-                type="text"
-                placeholder="color hash"
-                aria-describedby="inputGroupPrepend"
-                //value={textProps.color || ''}
-                onChange={(e) => onColorChange(e)}
-                onClick={(e) => e.target.focus()}
-            />
+            <div className="d-flex align-items-center">
+                {renderTextOptions()}
+                <input
+                    type="text"
+                    placeholder="google.com"
+                    aria-describedby="inputGroupPrependLink"
+                    //value={textProps.color || ''}
+                    //onChange={(e) => onColorChange(e)}
+                    //onClick={(e) => e.target.focus()}
+                />
+                <InputGroup.Prepend>
+                    <InputGroup.Text id="inputGroupPrependLink">link!</InputGroup.Text>
+                </InputGroup.Prepend>
+            </div>
+            <div className="d-flex align-items-center mt-2">
+                {renderColorOptions()}
+                <input
+                    type="text"
+                    placeholder="#ffffff"
+                    aria-describedby="inputGroupPrependColor"
+                    //value={textProps.color || ''}
+                    //onChange={(e) => onColorChange(e)}
+                    //onClick={(e) => e.target.focus()}
+                />
+                <InputGroup.Prepend>
+                    <InputGroup.Text id="inputGroupPrependColor">apply!</InputGroup.Text>
+                </InputGroup.Prepend>
+            </div>
         </div>
     );
 };

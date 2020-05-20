@@ -30,8 +30,8 @@ export default class TextEditor{
         this.element.contentEditable = true;
         this.element.focus();
         this.showSubmenu(
-            this.element.getBoundingClientRect().left,
-            this.element.getBoundingClientRect().top
+            this.element.getBoundingClientRect().left - 10,
+            this.element.getBoundingClientRect().top - 30
         );
     }
 
