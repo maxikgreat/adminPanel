@@ -1,10 +1,14 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { SubmenuContext } from "../../context/submenu/submenuContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InputGroup, Form} from 'react-bootstrap';
 
 const SubmenuCustom = ({workspace}) => {
     const { submenu } = useContext(SubmenuContext);
+    const [inputs, setInputs] = useState({
+        url: '',
+        color: ''
+    })
 
     const containerStyles = {
         position: "absolute",
@@ -35,11 +39,23 @@ const SubmenuCustom = ({workspace}) => {
     };
 
 
-    const onColorChange = (e) => {
-        let hash = `#${e.target.value}`;
-        if(/^#([0-9A-F]{3}){1,2}$/i.test(hash)) {
-            console.log(workspace.contentDocument.designMode);
-            onColorClick(hash);
+    const onColorCheckClick = () => {
+        if(/^#([0-9A-F]{3}){1,2}$/i.test(inputs.color)) {
+            onColorClick(inputs.color);
+        }
+    }
+
+    const onLinkAttach = () => {
+        let link = inputs.url;
+        if(link) {
+            if(!inputs.url.includes('https://www.')) {
+                link = 'https://www.' + link;
+            }
+            if(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/gm.test(link)) {
+                workspace.contentDocument.execCommand('createLink', false, link);
+            } else {
+                console.log("Invalid url")
+            }
         }
     }
 
@@ -81,11 +97,16 @@ const SubmenuCustom = ({workspace}) => {
                     type="text"
                     placeholder="google.com"
                     aria-describedby="inputGroupPrependLink"
-                    //value={textProps.color || ''}
-                    //onChange={(e) => onColorChange(e)}
-                    //onClick={(e) => e.target.focus()}
+                    value={inputs.url || ''}
+                    onChange={(e) => setInputs({
+                        ...inputs,
+                        url: e.target.value
+                    })}
+                    onClick={(e) => e.target.focus()}
                 />
-                <InputGroup.Prepend>
+                <InputGroup.Prepend
+                    onClick={() => onLinkAttach()}
+                >
                     <InputGroup.Text id="inputGroupPrependLink">link!</InputGroup.Text>
                 </InputGroup.Prepend>
             </div>
@@ -95,11 +116,16 @@ const SubmenuCustom = ({workspace}) => {
                     type="text"
                     placeholder="#ffffff"
                     aria-describedby="inputGroupPrependColor"
-                    //value={textProps.color || ''}
-                    //onChange={(e) => onColorChange(e)}
-                    //onClick={(e) => e.target.focus()}
+                    value={inputs.color || ''}
+                    onChange={(e) => setInputs({
+                        ...inputs,
+                        color: e.target.value
+                    })}
+                    onClick={(e) => e.target.focus()}
                 />
-                <InputGroup.Prepend>
+                <InputGroup.Prepend
+                    onClick={() => onColorCheckClick()}
+                >
                     <InputGroup.Text id="inputGroupPrependColor">apply!</InputGroup.Text>
                 </InputGroup.Prepend>
             </div>
