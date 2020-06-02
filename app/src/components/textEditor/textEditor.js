@@ -38,7 +38,7 @@ export default class TextEditor{
     onBlur(){
         this.enableScrolling();
         this.element.removeAttribute('contenteditable');
-        //this.hideSubmenu();
+        this.onTextEdit();
     }
 
     onKeyPress(e){
@@ -50,6 +50,7 @@ export default class TextEditor{
     onTextEdit(){
         //write changes from dirty copy to pure
         this.virtualElement.innerHTML = this.element.innerHTML;
+        console.log(this.element.innerHTML);
     };
 
     onContextMenu(e){

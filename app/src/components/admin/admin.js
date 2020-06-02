@@ -4,6 +4,7 @@ import "../../helpers/iframeLoader.js";
 import DOMHelper from "../../helpers/domHelper";
 import TextEditor from "../textEditor/textEditor";
 import ImagesEditor from "../imagesEditor/imagesEditor";
+import DnDEditor from "../dndEditor/dndEditor";
 import SubmenuCustom from "../submenu/submenu";
 import Login from "../login/login";
 import { Navbar } from "react-bootstrap";
@@ -60,6 +61,10 @@ const Admin = () => {
             }
         }
         checkAuth();
+        // document.addEventListener('click', e => {
+        //     e.stopPropagation();
+        //     hideSubmenu();
+        // })
     }, [currentPage, auth]);
 
     const checkAuth = () => {
@@ -108,6 +113,7 @@ const Admin = () => {
             .then((res) => DOMHelper.parseStrToDOM(res.data)) // convert string to dom structure
             .then(DOMHelper.wrapTextNodes) //wrap all text nodes with custom tags to editing
             .then(DOMHelper.wrapImages) //wrap all images
+            //.then(DOMHelper.wrapDnd)
             .then((dom) => {
                 _virtualDom.current = dom; // SAVE PURE DOM STRUCTURE
                 return dom;
@@ -123,12 +129,10 @@ const Admin = () => {
     };
 
     const stopScrolling = () => {
-        console.log("STOP SCROLL")
         _workFrame.current.contentDocument.body.style.overflow = "hidden";
     };
 
     const enableScrolling = () => {
-        console.log("ENABLE SCROLLING")
         _workFrame.current.contentDocument.body.style.overflow = "scroll";
     };
 
@@ -176,6 +180,7 @@ const Admin = () => {
                     alertShow
                 );
             });
+        workFrameContent.body = new DndEditor(workFrameContent.body).wrapDnd
     };
 
     const injectStyles = () => {
@@ -203,8 +208,14 @@ const Admin = () => {
 
     const savePage = async () => {
         loaderShow();
-        const newDom = _virtualDom.current.cloneNode(_virtualDom.current);
+        // const temp = _virtualDom.current;
+        const newDom = _virtualDom.current.cloneNode(true);
+        //console.log('virtual dom', _virtualDom.current);
+        // TODO submenu
+        //console.log('new dom', newDom);
+        //console.log('Equal', _virtualDom.current.isEqualNode(newDom));
         DOMHelper.unWrappedTextNodes(newDom);
+        //console.log('new dom after unwrapping', newDom);
         DOMHelper.unWrapImages(newDom);
         const html = DOMHelper.serializeDOMToString(newDom);
         try {
@@ -215,13 +226,13 @@ const Admin = () => {
             alertShow("success", "Success!", "Your changes was saved");
             loadBackupsList(currentPage);
         } catch (e) {
-            alertShow("danger", "Error!", "Some error");
+            alertShow("danger", "Error!", "Some error while saving page");
         }
         loaderHide();
     };
 
-    const loadBackupsList = (page) => {
-        axios
+    const loadBackupsList = async (page) => {
+        await axios
             .get("./backups/backups.json")
             .then((response) => {
                 setPageState((pageState) => {
@@ -294,6 +305,10 @@ const Admin = () => {
                                 <AlertCustom />
                             </div>
                             <div className='col-6 d-flex justify-content-around p-0'>
+                                <button 
+                                    onClick={() => {
+                                        console.log(_virtualDom.current)
+                                    }}>show dom</button>
                                 <Buttons
                                     modalShow={modalShow}
                                     savePage={savePage}
@@ -315,7 +330,7 @@ const Admin = () => {
                         style={{ display: "none" }}
                     />
                     <ModalCustom />
-                    <SubmenuCustom workspace={_workFrame.current}/>
+                    {/* <SubmenuCustom workspace={_workFrame.current}/> */}
                 </>
             )}
 

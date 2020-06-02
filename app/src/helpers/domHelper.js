@@ -29,6 +29,7 @@ export default class DOMHelper {
     };
 
     static unWrappedTextNodes(dom){
+        //console.log("HELPER WAS INIT WITH THIS DOM", dom);
         dom.body.querySelectorAll("text-editor").forEach(element => {
             element.parentNode.replaceChild(element.firstChild, element);
         })
@@ -55,6 +56,12 @@ export default class DOMHelper {
         dom.body.querySelectorAll("[editable-img-id]").forEach((img) => {
             img.removeAttribute("editable-img-id")
         });
+    }
+
+    static wrapDnd(dom){
+        //const sections = dom.body.querySelectorAll('section');
+
+        //return dom;
     }
 
 };
